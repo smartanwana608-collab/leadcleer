@@ -6,11 +6,9 @@
 
   <title>Filter Real Estate Agents | CSV Automation Tools</title>
 
-  <meta name="description" content="Upload a CSV file to identify and separate real estate agents using email-based detection." />
-  <meta name="robots" content="index, follow" />
+  <meta name="description" content="Upload a CSV file to preview and prepare filtering of real estate agents." />
 
   <style>
-    /* RESET */
     * {
       margin: 0;
       padding: 0;
@@ -31,7 +29,6 @@
       --card: #ffffff;
     }
 
-    /* HEADER */
     header {
       background: #ffffff;
       border-bottom: 1px solid var(--border);
@@ -41,7 +38,6 @@
 
     header h1 {
       font-size: 1.6rem;
-      margin-bottom: 4px;
     }
 
     header p {
@@ -49,14 +45,12 @@
       font-size: 0.95rem;
     }
 
-    /* MAIN */
     main {
       max-width: 1000px;
       margin: 40px auto;
       padding: 0 20px;
     }
 
-    /* CARD */
     .card {
       background: var(--card);
       border: 1px solid var(--border);
@@ -75,7 +69,6 @@
       margin-bottom: 20px;
     }
 
-    /* UPLOAD */
     .upload-box {
       border: 2px dashed var(--border);
       border-radius: 12px;
@@ -83,17 +76,10 @@
       text-align: center;
     }
 
-    .upload-box input {
-      margin-top: 15px;
+    input[type="file"] {
+      margin-top: 12px;
     }
 
-    .upload-hint {
-      font-size: 0.85rem;
-      color: var(--gray);
-      margin-top: 8px;
-    }
-
-    /* FILE INFO */
     .file-info {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -109,7 +95,6 @@
       font-size: 0.9rem;
     }
 
-    /* TABLE */
     .table-wrapper {
       margin-top: 20px;
       overflow-x: auto;
@@ -126,8 +111,8 @@
     th, td {
       padding: 12px;
       border-bottom: 1px solid var(--border);
-      text-align: left;
       white-space: nowrap;
+      text-align: left;
     }
 
     th {
@@ -135,7 +120,6 @@
       font-weight: 600;
     }
 
-    /* ACTION */
     .action {
       margin-top: 30px;
       text-align: right;
@@ -149,28 +133,20 @@
       border: none;
       font-size: 15px;
       font-weight: 600;
-      cursor: not-allowed;
-      opacity: 0.6;
+      cursor: pointer;
+      opacity: 0.4;
     }
 
-    /* FOOTER */
+    .btn.enabled {
+      opacity: 1;
+      cursor: pointer;
+    }
+
     footer {
       text-align: center;
       font-size: 0.85rem;
       color: var(--gray);
       padding: 20px;
-    }
-
-    footer a {
-      color: var(--primary);
-      text-decoration: none;
-      margin-left: 8px;
-    }
-
-    @media (max-width: 600px) {
-      header h1 {
-        font-size: 1.4rem;
-      }
     }
   </style>
 </head>
@@ -179,64 +155,44 @@
 
 <header>
   <h1>Filter Real Estate Agents</h1>
-  <p>Upload a CSV file to detect and separate real estate agents automatically.</p>
+  <p>Upload a CSV file to preview and prepare filtering.</p>
 </header>
 
 <main>
 
-  <!-- UPLOAD CARD -->
+  <!-- UPLOAD -->
   <div class="card">
     <h2>Upload CSV File</h2>
-    <p>Select your contact CSV file. All columns will be preserved.</p>
+    <p>Select a CSV file. All columns will remain intact.</p>
 
     <div class="upload-box">
-      <strong>Choose a CSV file</strong><br />
-      <input type="file" accept=".csv" disabled />
-      <div class="upload-hint">CSV only · Data stays in your browser</div>
+      <strong>Choose CSV file</strong><br />
+      <input type="file" id="csvFile" accept=".csv" />
     </div>
   </div>
 
   <!-- FILE INFO -->
   <div class="card">
     <h2>File Overview</h2>
-    <p>Summary of the uploaded file.</p>
 
     <div class="file-info">
-      <div class="info-item">File name: —</div>
-      <div class="info-item">Total rows: —</div>
-      <div class="info-item">Columns detected: —</div>
-      <div class="info-item">Email column: —</div>
+      <div class="info-item" id="fileName">File name: —</div>
+      <div class="info-item" id="rowCount">Total rows: —</div>
+      <div class="info-item" id="columnCount">Columns detected: —</div>
     </div>
   </div>
 
   <!-- PREVIEW -->
   <div class="card">
-    <h2>Data Preview</h2>
-    <p>First few rows from your CSV file.</p>
+    <h2>CSV Preview</h2>
+    <p>Showing first 5 rows.</p>
 
     <div class="table-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th>Column 1</th>
-            <th>Column 2</th>
-            <th>Column 3</th>
-            <th>...</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Sample</td>
-            <td>Sample</td>
-            <td>Sample</td>
-            <td>...</td>
-          </tr>
-        </tbody>
-      </table>
+      <table id="previewTable"></table>
     </div>
 
     <div class="action">
-      <button class="btn">Analyze CSV</button>
+      <button id="analyzeBtn" class="btn">Analyze CSV</button>
     </div>
   </div>
 
@@ -244,8 +200,67 @@
 
 <footer>
   © 2026 CSV Automation Tools
-  <a href="../index.html">Back to tools</a>
 </footer>
+
+<script>
+  const fileInput = document.getElementById("csvFile");
+  const table = document.getElementById("previewTable");
+  const fileNameEl = document.getElementById("fileName");
+  const rowCountEl = document.getElementById("rowCount");
+  const columnCountEl = document.getElementById("columnCount");
+  const analyzeBtn = document.getElementById("analyzeBtn");
+
+  fileInput.addEventListener("change", () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    fileNameEl.textContent = "File name: " + file.name;
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const text = e.target.result;
+      const rows = text.trim().split("\n").map(r => r.split(","));
+
+      const headers = rows[0];
+      const previewRows = rows.slice(1, 6);
+
+      rowCountEl.textContent = "Total rows: " + (rows.length - 1);
+      columnCountEl.textContent = "Columns detected: " + headers.length;
+
+      table.innerHTML = "";
+
+      const thead = document.createElement("thead");
+      const headRow = document.createElement("tr");
+
+      headers.forEach(h => {
+        const th = document.createElement("th");
+        th.textContent = h;
+        headRow.appendChild(th);
+      });
+
+      thead.appendChild(headRow);
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+
+      previewRows.forEach(row => {
+        const tr = document.createElement("tr");
+        row.forEach(cell => {
+          const td = document.createElement("td");
+          td.textContent = cell;
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+
+      table.appendChild(tbody);
+
+      analyzeBtn.classList.add("enabled");
+    };
+
+    reader.readAsText(file);
+  });
+</script>
 
 </body>
 </html>
