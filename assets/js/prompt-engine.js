@@ -1,5 +1,5 @@
 // ======================
-// PROMPT ENGINE (V1) — ES MODULE READY
+// PROMPT ENGINE (V1)
 // ======================
 
 // DOM
@@ -17,6 +17,10 @@ const downloadBtn = document.getElementById("downloadResult");
 // Detected actions UI
 const detectedActionsCard = document.getElementById("detectedActionsCard");
 const detectedActionsList = document.getElementById("detectedActionsList");
+
+// Preview UI ✅
+const previewCard = document.getElementById("previewCard");
+const csvPreviewTable = document.getElementById("csvPreviewTable");
 
 // Data
 let headers = [];
@@ -42,6 +46,44 @@ function downloadCSV(filename, headers, rows) {
   a.download = filename;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+// ======================
+// CSV PREVIEW RENDERER ✅
+// ======================
+function renderCSVPreview(tableEl, headers, rows, limit = 10) {
+  tableEl.innerHTML = "";
+
+  if (!rows.length) {
+    tableEl.innerHTML = "<tr><td>No data</td></tr>";
+    return;
+  }
+
+  const thead = document.createElement("thead");
+  const headRow = document.createElement("tr");
+
+  headers.forEach(h => {
+    const th = document.createElement("th");
+    th.textContent = h;
+    headRow.appendChild(th);
+  });
+
+  thead.appendChild(headRow);
+  tableEl.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
+
+  rows.slice(0, limit).forEach(row => {
+    const tr = document.createElement("tr");
+    row.forEach(cell => {
+      const td = document.createElement("td");
+      td.textContent = cell;
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+
+  tableEl.appendChild(tbody);
 }
 
 // ======================
@@ -88,7 +130,7 @@ function renderDetectedActions(actions) {
 }
 
 // ======================
-// LIVE PROMPT LISTENER ✅
+// LIVE PROMPT LISTENER
 // ======================
 promptInput.addEventListener("input", () => {
   const prompt = promptInput.value.trim();
@@ -139,7 +181,12 @@ runBtn.addEventListener("click", () => {
 
   const reader = new FileReader();
   reader.onload = e => {
+    // Parse CSV
     parseCSV(e.target.result);
+
+    // ✅ SHOW PREVIEW IMMEDIATELY
+    renderCSVPreview(csvPreviewTable, headers, rows);
+    previewCard.style.display = "block";
 
     const actions = detectActions(prompt);
     renderDetectedActions(actions);
@@ -164,6 +211,9 @@ runBtn.addEventListener("click", () => {
   reader.readAsText(file);
 });
 
+// ======================
+// DOWNLOAD
+// ======================
 downloadBtn.addEventListener("click", () => {
   if (resultRows.length) {
     downloadCSV("processed.csv", headers, resultRows);
