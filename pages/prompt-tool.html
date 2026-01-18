@@ -35,7 +35,6 @@
       style="width:100%; padding:14px; border-radius:10px; border:1px solid #e5e7eb;"
     ></textarea>
 
-    <!-- SUPPORTED ACTIONS -->
     <div style="margin-top:14px;">
       <strong>You can ask me to:</strong>
       <ul style="margin-top:8px; padding-left:18px; line-height:1.8;">
@@ -46,7 +45,7 @@
         <li>Create a new column</li>
       </ul>
       <p style="margin-top:8px; font-size:0.9rem; color:#6b7280;">
-        Tip: Use the same wording in your prompt for best results.
+        Tip: Use the same wording in your prompt.
       </p>
     </div>
   </div>
@@ -67,7 +66,8 @@
 
   <!-- RUN -->
   <div class="card">
-    <button id="runBtn" class="btn enabled">Run Prompt</button>
+    <button id="runBtn" class="btn" disabled>Run Prompt</button>
+
     <div id="statusBox" style="display:none; margin-top:12px;">
       <strong>Status:</strong> <span id="statusText"></span>
     </div>
@@ -100,7 +100,7 @@
 <script src="../actions/create-column.js"></script>
 
 <!-- PROMPT ENGINE -->
-<script src="../assets/js/prompt-tool.js"></script>
+<script src="../assets/js/prompt-engine.js"></script>
 
 </body>
 </html>
