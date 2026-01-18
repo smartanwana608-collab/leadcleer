@@ -1,9 +1,10 @@
 // ===================================
-// FILTER REAL ESTATE AGENTS (ACTION) — SAFE V1
+// FILTER REAL ESTATE AGENTS (ACTION) — SAFE V2 (ENGINE-COMPATIBLE)
 // ===================================
 
 /**
  * Default real estate keywords
+ * (Peter-approved set)
  */
 const DEFAULT_RE_KEYWORDS = [
   "realtor",
@@ -22,8 +23,13 @@ const DEFAULT_RE_KEYWORDS = [
  * Find email column indexes automatically
  */
 function findEmailColumns(headers) {
+  if (!Array.isArray(headers)) return [];
+
   return headers
-    .map((h, i) => ({ name: h.toLowerCase(), index: i }))
+    .map((h, i) => ({
+      name: String(h || "").toLowerCase(),
+      index: i
+    }))
     .filter(col => col.name.includes("email"))
     .map(col => col.index);
 }
@@ -32,11 +38,13 @@ function findEmailColumns(headers) {
  * Check if row belongs to a real estate agent
  */
 function isRealEstateAgent(row, emailIndexes, keywords) {
+  if (!Array.isArray(row)) return false;
+
   return emailIndexes.some(index => {
     const value = row[index];
     if (!value) return false;
 
-    const email = value.toLowerCase();
+    const email = String(value).toLowerCase();
     return keywords.some(keyword => email.includes(keyword));
   });
 }
@@ -44,25 +52,27 @@ function isRealEstateAgent(row, emailIndexes, keywords) {
 /**
  * Filter real estate agents from CSV
  *
- * @param {Array} headers
- * @param {Array} rows
- * @param {Array} customKeywords (optional)
- * @returns {Object}
+ * ALWAYS returns { headers, rows, meta }
  */
-function filterRealEstateAgents(headers, rows, customKeywords = []) {
+function filterRealEstateAgents(headers = [], rows = [], customKeywords = []) {
   const keywords =
-    customKeywords.length > 0 ? customKeywords : DEFAULT_RE_KEYWORDS;
+    Array.isArray(customKeywords) && customKeywords.length
+      ? customKeywords
+      : DEFAULT_RE_KEYWORDS;
 
   const emailIndexes = findEmailColumns(headers);
 
-  // ✅ SAFE EXIT: no email column
+  // 🟡 NO EMAIL COLUMN → SAFE NO-OP WITH MESSAGE
   if (!emailIndexes.length) {
     return {
       headers,
-      agents: [],
-      nonAgents: rows,
-      agentCount: 0,
-      nonAgentCount: rows.length
+      rows, // ← IMPORTANT: return original rows untouched
+      meta: {
+        warning:
+          "This CSV does not contain an email column. Real estate filtering was skipped.",
+        agentCount: 0,
+        nonAgentCount: rows.length
+      }
     };
   }
 
@@ -77,10 +87,11 @@ function filterRealEstateAgents(headers, rows, customKeywords = []) {
 
   return {
     headers,
-    agents,
-    nonAgents,
-    agentCount: agents.length,
-    nonAgentCount: nonAgents.length
+    rows: agents, // ← ENGINE EXPECTS rows HERE
+    meta: {
+      agentCount: agents.length,
+      nonAgentCount: nonAgents.length
+    }
   };
 }
 
