@@ -1,8 +1,10 @@
 // ======================
-// PROMPT ENGINE — STABLE V1
+// PROMPT ENGINE — FINAL V1
 // ======================
 
-// ---------- DOM ----------
+// ======================
+// DOM REFERENCES
+// ======================
 const promptInput = document.getElementById("promptInput");
 const fileInput = document.getElementById("csvFile");
 const runBtn = document.getElementById("runBtn");
@@ -20,11 +22,9 @@ const resultCard = document.getElementById("resultCard");
 const resultSummary = document.getElementById("resultSummary");
 const downloadBtn = document.getElementById("downloadResult");
 
-// Progress (already styled in CSS)
-const progressBar = document.getElementById("progressBar");
-const progressPercent = document.getElementById("progressPercent");
-
-// ---------- DATA ----------
+// ======================
+// DATA
+// ======================
 let headers = [];
 let rows = [];
 let finalRows = [];
@@ -57,15 +57,15 @@ function renderCSVPreview(tableEl, headers, rows, limit = 10) {
   tableEl.innerHTML = "";
 
   const thead = document.createElement("thead");
-  const headRow = document.createElement("tr");
+  const tr = document.createElement("tr");
 
   headers.forEach(h => {
     const th = document.createElement("th");
     th.textContent = h;
-    headRow.appendChild(th);
+    tr.appendChild(th);
   });
 
-  thead.appendChild(headRow);
+  thead.appendChild(tr);
   tableEl.appendChild(thead);
 
   const tbody = document.createElement("tbody");
@@ -84,16 +84,23 @@ function renderCSVPreview(tableEl, headers, rows, limit = 10) {
 }
 
 // ======================
-// PROMPT DETECTION
+// PROMPT → ACTION PARSER (WITH PARAMETERS)
 // ======================
 function detectActions(prompt) {
   const p = prompt.toLowerCase();
+
+  const splitMatch = p.match(/split (csv )?by column ([a-z0-9 _-]+)/i);
+  const extractHouseMatch = p.match(/extract house numbers from ([a-z0-9 _-]+)/i);
+  const createColumnMatch = p.match(/create (a )?new column ([a-z0-9 _-]+)/i);
 
   return {
     filterRealEstate: p.includes("real estate"),
     removeMissingEmail: p.includes("missing email"),
     removeDuplicates: p.includes("duplicate"),
-    extractHouseNumbers: p.includes("house"),
+
+    splitByColumn: splitMatch ? splitMatch[2].trim() : null,
+    extractHouseNumbers: extractHouseMatch ? extractHouseMatch[1].trim() : null,
+    createNewColumn: createColumnMatch ? createColumnMatch[2].trim() : null
   };
 }
 
@@ -104,10 +111,12 @@ function renderDetectedActions(actions) {
   detectedActionsList.innerHTML = "";
 
   const map = {
-    filterRealEstate: "Filter real estate agents",
-    removeMissingEmail: "Remove rows missing email",
-    removeDuplicates: "Remove duplicate contacts",
-    extractHouseNumbers: "Extract house numbers",
+    filterRealEstate: () => "Filter real estate agents",
+    removeMissingEmail: () => "Remove rows missing email",
+    removeDuplicates: () => "Remove duplicate contacts",
+    splitByColumn: col => `Split CSV by column "${col}"`,
+    extractHouseNumbers: col => `Extract house numbers from "${col}"`,
+    createNewColumn: col => `Create new column "${col}"`
   };
 
   let found = false;
@@ -116,7 +125,7 @@ function renderDetectedActions(actions) {
     if (actions[key]) {
       found = true;
       const li = document.createElement("li");
-      li.textContent = map[key];
+      li.textContent = map[key](actions[key]);
       detectedActionsList.appendChild(li);
     }
   });
@@ -126,19 +135,16 @@ function renderDetectedActions(actions) {
 }
 
 // ======================
-// RUN BUTTON ENABLE LOGIC
+// ENABLE RUN BUTTON
 // ======================
 function updateRunButton() {
-  const enabled =
-    promptInput.value.trim().length > 0 &&
-    fileInput.files.length > 0;
-
-  runBtn.disabled = !enabled;
-  runBtn.classList.toggle("enabled", enabled);
+  runBtn.disabled = !(promptInput.value.trim() && fileInput.files.length);
+  runBtn.classList.toggle("enabled", !runBtn.disabled);
 }
 
 promptInput.addEventListener("input", () => {
-  renderDetectedActions(detectActions(promptInput.value.trim()));
+  const actions = detectActions(promptInput.value.trim());
+  renderDetectedActions(actions);
   updateRunButton();
 });
 
@@ -152,7 +158,7 @@ runBtn.addEventListener("click", () => {
   const file = fileInput.files[0];
 
   if (!prompt) {
-    alert("Please write a prompt before running.");
+    alert("Please enter a prompt first.");
     return;
   }
 
@@ -162,77 +168,76 @@ runBtn.addEventListener("click", () => {
   }
 
   const actions = detectActions(prompt);
-  const hasActions = renderDetectedActions(actions);
+  const hasAction = renderDetectedActions(actions);
 
-  if (!hasActions) {
-    alert("No valid actions detected. Use the supported wording.");
+  if (!hasAction) {
+    alert("No valid action detected. Please use supported action wording.");
     return;
   }
 
-  // UI RESET
-  runBtn.disabled = true;
   statusBox.style.display = "block";
   statusText.textContent = "Reading CSV…";
-  progressBar.style.width = "20%";
-  progressPercent.textContent = "20%";
 
   const reader = new FileReader();
-
   reader.onload = e => {
-    try {
-      // ---------- PARSE ----------
-      parseCSV(e.target.result);
+    parseCSV(e.target.result);
 
-      previewCard.style.display = "block";
-      renderCSVPreview(csvPreviewTable, headers, rows);
+    // Preview original CSV
+    previewCard.style.display = "block";
+    renderCSVPreview(csvPreviewTable, headers, rows);
 
-      statusText.textContent = "Applying selected actions…";
-      progressBar.style.width = "60%";
-      progressPercent.textContent = "60%";
+    statusText.textContent = "Applying selected actions…";
 
-      finalRows = [...rows];
+    finalRows = [...rows];
 
-      // ---------- APPLY ACTIONS ----------
-      if (actions.filterRealEstate) {
-        const res = window.filterRealEstateAgents(headers, finalRows);
-        finalRows = res?.agents || finalRows;
-      }
-
-      if (actions.removeMissingEmail) {
-        const res = window.removeMissingEmail(headers, finalRows);
-        finalRows = res?.withEmail || finalRows;
-      }
-
-      if (actions.removeDuplicates) {
-        finalRows = window.removeDuplicates(finalRows) || finalRows;
-      }
-
-      if (actions.extractHouseNumbers) {
-        const res = window.extractHouseNumbers(headers, finalRows);
-        finalRows = res?.rows || finalRows;
-      }
-
-      // ---------- FINALIZE ----------
-      statusText.textContent = "Finalizing results…";
-      progressBar.style.width = "100%";
-      progressPercent.textContent = "100%";
-
-      resultSummary.textContent =
-        `Columns detected: ${headers.length}\n` +
-        `Original rows: ${rows.length}\n` +
-        `Final rows: ${finalRows.length}`;
-
-      resultCard.style.display = "block";
-      downloadBtn.disabled = false;
-      downloadBtn.classList.add("enabled");
-
-    } catch (err) {
-      console.error(err);
-      alert("An error occurred while applying actions. Check the CSV or action compatibility.");
-    } finally {
-      runBtn.disabled = false;
-      statusText.textContent = "Completed";
+    // ======================
+    // APPLY ACTIONS (ORDERED)
+    // ======================
+    if (actions.filterRealEstate) {
+      const result = window.filterRealEstateAgents(headers, finalRows);
+      finalRows = result.agents;
     }
+
+    if (actions.removeMissingEmail) {
+      const result = window.removeMissingEmail(headers, finalRows);
+      finalRows = result.withEmail;
+    }
+
+    if (actions.removeDuplicates) {
+      const result = window.removeDuplicates(headers, finalRows);
+      finalRows = result.rows;
+    }
+
+    if (actions.extractHouseNumbers) {
+      const result = window.extractHouseNumbers(
+        headers,
+        finalRows,
+        actions.extractHouseNumbers
+      );
+      headers = result.headers;
+      finalRows = result.rows;
+    }
+
+    if (actions.createNewColumn) {
+      const result = window.createNewColumn(
+        headers,
+        finalRows,
+        actions.createNewColumn
+      );
+      headers = result.headers;
+      finalRows = result.rows;
+    }
+
+    // ======================
+    // RESULTS
+    // ======================
+    resultSummary.textContent =
+      `Columns: ${headers.length}\n` +
+      `Original rows: ${rows.length}\n` +
+      `Final rows: ${finalRows.length}`;
+
+    resultCard.style.display = "block";
+    statusText.textContent = "Completed";
   };
 
   reader.readAsText(file);
@@ -242,7 +247,9 @@ runBtn.addEventListener("click", () => {
 // DOWNLOAD
 // ======================
 downloadBtn.addEventListener("click", () => {
-  if (finalRows.length) {
-    downloadCSV("processed.csv", headers, finalRows);
+  if (!finalRows.length) {
+    alert("Nothing to download.");
+    return;
   }
+  downloadCSV("processed.csv", headers, finalRows);
 });
