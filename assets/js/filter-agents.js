@@ -1,7 +1,9 @@
 // ======================
-// KEYWORDS (Editable)
+// KEYWORD STORAGE
 // ======================
-let keywords = [
+const STORAGE_KEY = "csv_agent_keywords";
+
+let keywords = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [
   "realtor",
   "realty",
   "broker",
@@ -17,6 +19,10 @@ let keywords = [
 // ======================
 // HELPERS
 // ======================
+function saveKeywords() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(keywords));
+}
+
 function isAgentEmail(email) {
   if (!email) return false;
   const lower = email.toLowerCase();
@@ -61,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const downloadAgentsBtn = document.getElementById("downloadAgents");
   const downloadOthersBtn = document.getElementById("downloadOthers");
 
-  // Keyword UI elements
+  // Keyword UI
   const keywordListEl = document.getElementById("keywordList");
   const newKeywordInput = document.getElementById("newKeyword");
   const addKeywordBtn = document.getElementById("addKeywordBtn");
@@ -88,11 +94,11 @@ document.addEventListener("DOMContentLoaded", () => {
       keywordListEl.appendChild(tag);
     });
 
-    // Remove keyword handler
     keywordListEl.querySelectorAll("button").forEach(btn => {
       btn.addEventListener("click", () => {
         const index = parseInt(btn.dataset.index);
         keywords.splice(index, 1);
+        saveKeywords();
         renderKeywords();
       });
     });
@@ -104,6 +110,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!value || keywords.includes(value)) return;
 
       keywords.push(value);
+      saveKeywords();
       newKeywordInput.value = "";
       renderKeywords();
     });
@@ -123,8 +130,6 @@ document.addEventListener("DOMContentLoaded", () => {
     analyzeBtn.classList.add("enabled");
     analyzeBtn.disabled = false;
     analyzeBtn.textContent = "Analyze CSV";
-    analyzeBtn.style.opacity = "1";
-    analyzeBtn.style.cursor = "pointer";
   });
 
   // ======================
@@ -136,13 +141,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     analyzeBtn.textContent = "Analyzing…";
     analyzeBtn.disabled = true;
-    analyzeBtn.style.opacity = "0.6";
 
     const reader = new FileReader();
-
     reader.onload = e => {
-      const text = e.target.result;
-      const rows = text.trim().split("\n").map(r => r.split(","));
+      const rows = e.target.result.trim().split("\n").map(r => r.split(","));
 
       headers = rows[0];
       parsedRows = rows.slice(1);
@@ -150,31 +152,25 @@ document.addEventListener("DOMContentLoaded", () => {
       rowCountEl.textContent = `Total rows: ${parsedRows.length}`;
       columnCountEl.textContent = `Detected columns: ${headers.length}`;
 
-      // Detect email columns
       const emailIndexes = headers
-        .map((h, i) => ({ name: h.toLowerCase(), index: i }))
-        .filter(col => col.name.includes("email"))
-        .map(col => col.index);
+        .map((h, i) => ({ h: h.toLowerCase(), i }))
+        .filter(col => col.h.includes("email"))
+        .map(col => col.i);
 
       agents = [];
       nonAgents = [];
 
       parsedRows.forEach(row => {
-        if (isRealEstateAgent(row, emailIndexes)) {
-          agents.push(row);
-        } else {
-          nonAgents.push(row);
-        }
+        isRealEstateAgent(row, emailIndexes)
+          ? agents.push(row)
+          : nonAgents.push(row);
       });
 
       agentCountEl.textContent = agents.length;
       otherCountEl.textContent = nonAgents.length;
 
       downloadAgentsBtn.classList.add("enabled");
-      downloadAgentsBtn.disabled = false;
-
       downloadOthersBtn.classList.add("enabled");
-      downloadOthersBtn.disabled = false;
 
       analyzeBtn.textContent = "Analysis Complete";
     };
@@ -186,12 +182,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // DOWNLOADS
   // ======================
   downloadAgentsBtn.addEventListener("click", () => {
-    if (!agents.length) return;
-    downloadCSV("real_estate_agents.csv", headers, agents);
+    if (agents.length) downloadCSV("real_estate_agents.csv", headers, agents);
   });
 
   downloadOthersBtn.addEventListener("click", () => {
-    if (!nonAgents.length) return;
-    downloadCSV("other_contacts.csv", headers, nonAgents);
+    if (nonAgents.length) downloadCSV("other_contacts.csv", headers, nonAgents);
   });
 });
