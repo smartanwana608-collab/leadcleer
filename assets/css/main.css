@@ -39,16 +39,11 @@ body {
   align-items: center;
 }
 
-/* LOGO */
 .logo {
   font-size: 22px;
   font-weight: 800;
   color: var(--violet);
   text-decoration: none;
-}
-
-.logo:hover {
-  opacity: 0.9;
 }
 
 .nav-links a {
@@ -113,6 +108,7 @@ body {
   text-decoration: none;
   border: none;
   cursor: pointer;
+  text-align: center;
 }
 
 .btn.primary {
@@ -124,37 +120,10 @@ body {
   opacity: 0.9;
 }
 
-.btn.pro-disabled,
 .disabled-btn {
   background: #2a2a2a;
   color: #9ca3af;
   cursor: not-allowed;
-}
-
-/* ================= SECTIONS ================= */
-section {
-  padding: 100px 20px;
-}
-
-h2 {
-  text-align: center;
-  font-size: 2.1rem;
-  margin-bottom: 60px;
-}
-
-/* ================= FEATURE GRID (HOME) ================= */
-.feature-grid {
-  max-width: 1100px;
-  margin: auto;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 24px;
-}
-
-.feature-card {
-  background: var(--card);
-  padding: 28px;
-  border-radius: 16px;
 }
 
 /* ================= PAGE HERO ================= */
@@ -193,55 +162,6 @@ h2 {
   flex-direction: column;
 }
 
-/* TEXT STACK */
-.feature-card-page h2 {
-  margin-bottom: 12px;
-}
-
-.feature-desc {
-  color: var(--muted);
-  margin-bottom: 16px;
-}
-
-.feature-card-page ul {
-  list-style: none;
-  margin-bottom: 24px;
-}
-
-.feature-card-page ul li {
-  margin-bottom: 8px;
-}
-
-/* ✅ FIX: BUTTON ALIGNMENT */
-.feature-card-page .btn {
-  margin-top: auto;
-  align-self: center;
-  width: 100%;
-  max-width: 240px;
-  text-align: center;
-}
-
-/* BADGES */
-.feature-badge {
-  position: absolute;
-  top: 18px;
-  right: 18px;
-  font-size: 12px;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-weight: 600;
-}
-
-.feature-badge.beta {
-  background: rgba(107,78,255,0.2);
-  color: var(--violet);
-}
-
-.feature-badge.pro {
-  background: rgba(255,215,0,0.2);
-  color: gold;
-}
-
 /* ================= PRICING ================= */
 .pricing-section {
   max-width: 1100px;
@@ -266,6 +186,11 @@ h2 {
   color: var(--violet);
 }
 
+/* 🔥 FIX: ALIGN PRICING BUTTONS PERFECTLY */
+.pricing-card .btn {
+  margin-top: auto;
+}
+
 /* ================= FOOTER ================= */
 .footer {
   border-top: 1px solid var(--border);
@@ -281,33 +206,14 @@ h2 {
   gap: 60px;
 }
 
-.footer-logo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.logo-dot {
-  width: 10px;
-  height: 10px;
-  background: var(--violet);
-  border-radius: 50%;
-}
-
 .footer-links {
   display: flex;
   gap: 60px;
 }
 
-.footer-column h4 {
-  margin-bottom: 12px;
-}
-
 .footer-column a {
-  display: block;
-  margin-bottom: 8px;
-  text-decoration: none;
   color: var(--muted);
+  text-decoration: none;
 }
 
 .footer-column a:hover {
@@ -323,10 +229,6 @@ h2 {
 
 /* ================= MOBILE ================= */
 @media (max-width: 768px) {
-  .nav {
-    padding: 16px 20px;
-  }
-
   .nav-links {
     display: none;
   }
