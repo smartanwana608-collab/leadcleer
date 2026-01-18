@@ -1,1 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <title>Prompt-Based CSV Tool | CSV Automation Tools</title>
+
+  <link rel="stylesheet" href="../assets/css/main.css" />
+</head>
+
+<body>
+
+<header class="tool-header">
+  <a href="../index.html" class="back-home">← Home</a>
+  <h1>Prompt-Based CSV Tool</h1>
+  <p>Describe what you want to do with your CSV. We’ll handle the rest.</p>
+</header>
+
+<main class="tool-container">
+
+  <!-- PROMPT -->
+  <div class="card">
+    <h2>What do you want to do?</h2>
+    <p>Example: “Remove rows missing email and remove duplicates.”</p>
+
+    <textarea
+      id="promptInput"
+      rows="4"
+      placeholder="Type your instruction here..."
+      style="width:100%; padding:14px; border-radius:10px; border:1px solid #e5e7eb;"
+    ></textarea>
+  </div>
+
+  <!-- UPLOAD -->
+  <div class="card">
+    <div class="upload-box">
+      <input type="file" id="csvFile" accept=".csv" />
+    </div>
+  </div>
+
+  <!-- STATUS -->
+  <div class="card">
+    <button id="runBtn" class="btn">Run Prompt</button>
+
+    <div id="statusBox" style="margin-top:20px; display:none;">
+      <strong>Status:</strong>
+      <p id="statusText">Processing…</p>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="card" id="resultCard" style="display:none;">
+    <h2>Result</h2>
+    <p id="resultSummary"></p>
+
+    <div class="downloads">
+      <button id="downloadResult" class="download-btn">
+        Download Result CSV
+      </button>
+    </div>
+  </div>
+
+</main>
+
+<script src="../assets/js/prompt-engine.js"></script>
+</body>
+</html>
