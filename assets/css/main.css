@@ -50,7 +50,65 @@ body {
   color: var(--violet);
 }
 
-/* ================= PAGE HERO ================= */
+/* ================= HOME HERO ================= */
+.hero {
+  position: relative;
+  padding: 120px 20px 140px;
+  text-align: center;
+}
+
+.hero-content {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.hero h1 {
+  font-size: clamp(2.4rem, 5vw, 3.6rem);
+  font-weight: 800;
+}
+
+.hero h1 span {
+  color: var(--violet);
+}
+
+.hero-subtext {
+  margin-top: 20px;
+  font-size: 1.1rem;
+  color: var(--muted);
+}
+
+.hero-actions {
+  margin-top: 36px;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+.btn {
+  padding: 14px 26px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  text-align: center;
+}
+
+.btn.primary {
+  background: var(--violet);
+  color: white;
+}
+
+.btn.primary:hover {
+  box-shadow: 0 0 18px var(--violet-glow);
+}
+
+.hero-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, var(--violet-glow), transparent 60%);
+  z-index: -1;
+}
+
+/* ================= PAGE HERO (NON-HOME) ================= */
 .page-hero {
   max-width: 900px;
   margin: 80px auto 60px;
@@ -59,56 +117,45 @@ body {
 }
 
 .page-hero h1 {
-  font-size: clamp(2.2rem, 5vw, 3rem);
-  margin-bottom: 14px;
+  font-size: 42px;
+  margin-bottom: 12px;
 }
 
 .page-hero p {
   color: var(--muted);
-  font-size: 1.05rem;
+  font-size: 18px;
 }
 
-/* ================= FEATURES GRID ================= */
+/* ================= FEATURES PAGE ================= */
 .features-grid-page {
   max-width: 1100px;
-  margin: 0 auto 120px;
+  margin: 0 auto 100px;
   padding: 0 20px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 28px;
 }
 
-/* ================= FEATURE CARD ================= */
 .feature-card-page {
   background: linear-gradient(180deg, #14172a, #0d0f1d);
   border-radius: 16px;
-  padding: 32px;
-  position: relative;
+  padding: 28px;
   display: flex;
   flex-direction: column;
-}
-
-.feature-card-page:hover {
-  transform: translateY(-4px);
-  transition: transform 0.25s ease;
-}
-
-.feature-content {
-  flex: 1;
+  position: relative;
 }
 
 .feature-card-page h2 {
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .feature-desc {
   color: var(--muted);
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 .feature-card-page ul {
   list-style: none;
-  padding: 0;
   margin-bottom: 24px;
 }
 
@@ -116,20 +163,34 @@ body {
   margin-bottom: 8px;
 }
 
-/* ================= CTA BUTTON ================= */
 .feature-card-page .btn {
   margin-top: auto;
-  width: 100%;
-  text-align: center;
-  border-radius: 10px;
-  padding: 14px 0;
 }
 
-.btn.primary {
-  background: var(--violet);
-  color: #fff;
-  text-decoration: none;
+/* BADGES */
+.feature-badge {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
   font-weight: 600;
+}
+
+.feature-badge.beta {
+  background: rgba(107,78,255,0.15);
+  color: var(--violet);
+}
+
+.feature-badge.pro {
+  background: rgba(255,215,0,0.15);
+  color: gold;
+}
+
+/* PRO / DISABLED */
+.feature-card-page.pro {
+  opacity: 0.6;
 }
 
 .disabled-btn {
@@ -138,30 +199,93 @@ body {
   cursor: not-allowed;
 }
 
-/* ================= BADGES ================= */
-.feature-badge {
-  position: absolute;
-  top: 18px;
-  right: 18px;
-  font-size: 12px;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-weight: 600;
+/* ================= PRICING PAGE ================= */
+.pricing-hero {
+  text-align: center;
+  padding: 80px 20px 60px;
 }
 
-.feature-badge.beta {
-  background: rgba(107, 78, 255, 0.15);
+.pricing-hero h1 {
+  font-size: 2.4rem;
+  margin-bottom: 12px;
+}
+
+.pricing-hero p {
+  max-width: 700px;
+  margin: 0 auto;
+  color: var(--muted);
+}
+
+.pricing-section {
+  max-width: 1100px;
+  margin: 0 auto 100px;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 28px;
+}
+
+.pricing-card {
+  background: linear-gradient(180deg, #14172a, #0d0f1d);
+  border-radius: 16px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.pricing-card.active {
+  outline: 2px solid var(--violet);
+}
+
+.pricing-card h2 {
+  margin-bottom: 6px;
+}
+
+.price {
+  font-size: 3rem;
+  font-weight: 800;
   color: var(--violet);
 }
 
-.feature-badge.pro {
-  background: rgba(255, 215, 0, 0.15);
-  color: gold;
+.price-note {
+  color: var(--muted);
+  margin-bottom: 20px;
 }
 
-/* ================= PRO CARD ================= */
-.feature-card-page.pro {
-  opacity: 0.6;
+.pricing-features {
+  list-style: none;
+  margin-bottom: 28px;
+}
+
+.pricing-features li {
+  margin-bottom: 10px;
+}
+
+/* ================= CONTACT / HOW IT WORKS ================= */
+.content-wrapper {
+  max-width: 900px;
+  margin: 0 auto 100px;
+  padding: 0 20px;
+}
+
+.content-wrapper h2 {
+  margin-top: 32px;
+  margin-bottom: 12px;
+}
+
+.content-wrapper p,
+.content-wrapper li {
+  color: var(--muted);
+}
+
+.content-wrapper ul {
+  list-style: none;
+  margin-top: 12px;
+}
+
+.content-wrapper ul li {
+  margin-bottom: 8px;
 }
 
 /* ================= FOOTER ================= */
@@ -229,8 +353,8 @@ body {
     display: none;
   }
 
-  .page-hero {
-    margin-top: 60px;
+  .hero {
+    padding: 90px 20px;
   }
 
   .footer-links {
