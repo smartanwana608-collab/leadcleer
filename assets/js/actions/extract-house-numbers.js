@@ -3,15 +3,14 @@
 // ===================================
 
 /**
- * Find possible "notes" columns
+ * Try to detect a notes-like column
  */
-function findNotesColumns(headers) {
-  const keywords = ["note", "notes", "comment", "comments", "description", "remarks"];
+function findNotesColumn(headers) {
+  const keywords = ["note", "address", "remark", "description", "comment"];
 
-  return headers
-    .map((h, i) => ({ name: h.toLowerCase(), index: i }))
-    .filter(col => keywords.some(k => col.name.includes(k)))
-    .map(col => col.index);
+  return headers.findIndex(h =>
+    keywords.some(k => h.toLowerCase().includes(k))
+  );
 }
 
 /**
@@ -20,60 +19,45 @@ function findNotesColumns(headers) {
 function extractHouseNumber(text) {
   if (!text) return "";
 
-  const match = text.match(/\b\d+[a-zA-Z]?\b|\b\d+-\d+\b/);
+  // Matches numbers like:
+  // 123, 12B, 45-47, 8A
+  const match = text.match(/\b\d+[a-zA-Z]?(?:-\d+)?\b/);
   return match ? match[0] : "";
 }
 
 /**
  * Main action
+ *
+ * @param {Array} headers
+ * @param {Array} rows
+ * @returns {Object}
  */
-function extractHouseNumbers(headers, rows, newColumnName = "House Number") {
-  const notesIndexes = findNotesColumns(headers);
+function extractHouseNumbers(headers, rows) {
+  const notesIndex = findNotesColumn(headers);
 
-  // Add new column
-  const updatedHeaders = [...headers, newColumnName];
+  // If no notes column, return original data unchanged
+  if (notesIndex === -1) {
+    return {
+      headers,
+      rows
+    };
+  }
 
-  const updatedRows = rows.map(row => {
-    let houseNumber = "";
+  const newHeaders = [...headers, "house_number"];
 
-    for (const idx of notesIndexes) {
-      if (row[idx]) {
-        const found = extractHouseNumber(row[idx]);
-        if (found) {
-          houseNumber = found;
-          break;
-        }
-      }
-    }
-
+  const newRows = rows.map(row => {
+    const notesText = row[notesIndex];
+    const houseNumber = extractHouseNumber(notesText);
     return [...row, houseNumber];
   });
 
   return {
-    headers: updatedHeaders,
-    rows: updatedRows
+    headers: newHeaders,
+    rows: newRows
   };
-}
-
-/**
- * Download helper
- */
-function downloadExtractedCSV(headers, rows, filename) {
-  const csv = [headers, ...rows].map(r => r.join(",")).join("\n");
-  const blob = new Blob([csv], { type: "text/csv" });
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
 }
 
 // ===================================
 // EXPORT FOR PROMPT ENGINE
 // ===================================
 window.extractHouseNumbers = extractHouseNumbers;
-window.downloadExtractedCSV = downloadExtractedCSV;
