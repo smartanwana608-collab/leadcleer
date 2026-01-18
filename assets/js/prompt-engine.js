@@ -1,22 +1,17 @@
 // ======================
-// PROMPT ENGINE — SMART PARAMETERS V3
+// PROMPT ENGINE — CLEAN V3 (STABLE + SAFE)
 // ======================
 
-// ---------- DOM ----------
+// DOM
 const promptInput = document.getElementById("promptInput");
 const fileInput = document.getElementById("csvFile");
 const runBtn = document.getElementById("runBtn");
 
 const statusBox = document.getElementById("statusBox");
 const statusText = document.getElementById("statusText");
-const progressBar = document.getElementById("progressBar");
-const progressPercent = document.getElementById("progressPercent");
 
 const detectedActionsCard = document.getElementById("detectedActionsCard");
 const detectedActionsList = document.getElementById("detectedActionsList");
-
-const actionParamsCard = document.getElementById("actionParamsCard");
-const actionParamsFields = document.getElementById("actionParamsFields");
 
 const previewCard = document.getElementById("previewCard");
 const csvPreviewTable = document.getElementById("csvPreviewTable");
@@ -25,7 +20,11 @@ const resultCard = document.getElementById("resultCard");
 const resultSummary = document.getElementById("resultSummary");
 const downloadBtn = document.getElementById("downloadResult");
 
-// ---------- DATA ----------
+// Progress
+const progressBar = document.getElementById("progressBar");
+const progressPercent = document.getElementById("progressPercent");
+
+// Data
 let headers = [];
 let rows = [];
 let finalRows = [];
@@ -39,20 +38,8 @@ function parseCSV(text) {
   rows = lines.slice(1).map(r => r.split(","));
 }
 
-function downloadCSV(filename, headers, rows) {
-  const csv = [headers, ...rows].map(r => r.join(",")).join("\n");
-  const blob = new Blob([csv], { type: "text/csv" });
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
 // ======================
-// CSV PREVIEW
+// PREVIEW
 // ======================
 function renderCSVPreview(tableEl, headers, rows, limit = 10) {
   tableEl.innerHTML = "";
@@ -85,22 +72,24 @@ function renderCSVPreview(tableEl, headers, rows, limit = 10) {
 }
 
 // ======================
-// PROMPT DETECTION
+// PROMPT DETECTOR
 // ======================
 function detectActions(prompt) {
   const p = prompt.toLowerCase();
+
   return {
     filterRealEstate: p.includes("real estate"),
     removeMissingEmail: p.includes("missing email"),
     removeDuplicates: p.includes("duplicate"),
+
+    // Parameter-required actions (blocked for now)
     extractHouseNumbers: p.includes("house"),
     createColumn: p.includes("new column"),
-    splitByColumn: p.includes("split")
   };
 }
 
 // ======================
-// DETECTED ACTIONS UI
+// ACTION LIST UI
 // ======================
 function renderDetectedActions(actions) {
   detectedActionsList.innerHTML = "";
@@ -109,9 +98,8 @@ function renderDetectedActions(actions) {
     filterRealEstate: "Filter real estate agents",
     removeMissingEmail: "Remove rows missing email",
     removeDuplicates: "Remove duplicate contacts",
-    extractHouseNumbers: "Extract house numbers",
-    createColumn: "Create a new column",
-    splitByColumn: "Split CSV by column"
+    extractHouseNumbers: "Extract house numbers (needs column)",
+    createColumn: "Create a new column (needs name)",
   };
 
   let found = false;
@@ -126,88 +114,6 @@ function renderDetectedActions(actions) {
   });
 
   detectedActionsCard.style.display = found ? "block" : "none";
-  return found;
-}
-
-// ======================
-// SMART PARAMETER UI
-// ======================
-function renderActionParameters(actions) {
-  actionParamsFields.innerHTML = "";
-  actionParamsCard.style.display = "none";
-
-  let needsParams = false;
-
-  function columnDropdown(id, label) {
-    const options = headers.map(
-      h => `<option value="${h}">${h}</option>`
-    ).join("");
-
-    return `
-      <label>${label}</label>
-      <select id="${id}">
-        <option value="">Select column</option>
-        ${options}
-      </select>
-    `;
-  }
-
-  if (actions.extractHouseNumbers) {
-    needsParams = true;
-    actionParamsFields.innerHTML += columnDropdown(
-      "houseSourceColumn",
-      "Column to extract house numbers from"
-    );
-  }
-
-  if (actions.splitByColumn) {
-    needsParams = true;
-    actionParamsFields.innerHTML += columnDropdown(
-      "splitColumn",
-      "Column to split CSV by"
-    );
-  }
-
-  if (actions.createColumn) {
-    needsParams = true;
-    actionParamsFields.innerHTML += `
-      <label>New column name</label>
-      <input id="newColumnName" placeholder="e.g. Notes" />
-    `;
-  }
-
-  if (needsParams) {
-    actionParamsCard.style.display = "block";
-  }
-
-  return needsParams;
-}
-
-// ======================
-// VALIDATION
-// ======================
-function validate(actions) {
-  if (!Object.values(actions).some(v => v)) {
-    alert("No valid action detected in your prompt.");
-    return false;
-  }
-
-  if (actions.extractHouseNumbers && !document.getElementById("houseSourceColumn").value) {
-    alert("Please select a column for house number extraction.");
-    return false;
-  }
-
-  if (actions.splitByColumn && !document.getElementById("splitColumn").value) {
-    alert("Please select a column to split by.");
-    return false;
-  }
-
-  if (actions.createColumn && !document.getElementById("newColumnName").value.trim()) {
-    alert("Please enter a new column name.");
-    return false;
-  }
-
-  return true;
 }
 
 // ======================
@@ -218,81 +124,89 @@ function updateRunButton() {
 }
 
 promptInput.addEventListener("input", () => {
-  const actions = detectActions(promptInput.value.trim());
-  renderDetectedActions(actions);
+  renderDetectedActions(detectActions(promptInput.value.trim()));
   updateRunButton();
 });
 
 fileInput.addEventListener("change", updateRunButton);
 
 // ======================
-// RUN PROMPT
+// RUN PROMPT (SAFE MODE)
 // ======================
 runBtn.addEventListener("click", () => {
   const prompt = promptInput.value.trim();
   const file = fileInput.files[0];
+
+  if (!prompt) {
+    alert("Please enter a prompt first.");
+    return;
+  }
+
+  if (!file) {
+    alert("Please upload a CSV file.");
+    return;
+  }
+
   const actions = detectActions(prompt);
 
+  // 🚫 BLOCK PARAMETER ACTIONS
+  if (actions.extractHouseNumbers || actions.createColumn) {
+    alert(
+      "This action requires additional parameters.\n" +
+      "Parameter selection UI is coming next."
+    );
+    return;
+  }
+
   statusBox.style.display = "block";
-  statusText.textContent = "Reading CSV...";
+  statusText.textContent = "Processing CSV…";
   progressBar.style.width = "10%";
   progressPercent.textContent = "10%";
 
   const reader = new FileReader();
+
   reader.onload = e => {
     parseCSV(e.target.result);
+
+    progressBar.style.width = "30%";
+    progressPercent.textContent = "30%";
 
     previewCard.style.display = "block";
     renderCSVPreview(csvPreviewTable, headers, rows);
 
-    renderActionParameters(actions);
-
-    if (!validate(actions)) {
-      statusText.textContent = "Waiting for parameters...";
-      return;
-    }
-
     finalRows = [...rows];
-    statusText.textContent = "Applying actions...";
-    progressBar.style.width = "70%";
 
-    if (actions.filterRealEstate) {
-      finalRows = window.filterRealEstateAgents(headers, finalRows).agents;
+    try {
+      if (actions.filterRealEstate) {
+        finalRows = window.filterRealEstateAgents(headers, finalRows).agents;
+      }
+
+      progressBar.style.width = "60%";
+      progressPercent.textContent = "60%";
+
+      if (actions.removeMissingEmail) {
+        finalRows = window.removeMissingEmail(headers, finalRows).withEmail;
+      }
+
+      if (actions.removeDuplicates) {
+        finalRows = window.removeDuplicates(headers, finalRows).rows;
+      }
+
+      progressBar.style.width = "100%";
+      progressPercent.textContent = "100%";
+
+      resultSummary.textContent =
+        `Columns: ${headers.length}\n` +
+        `Original rows: ${rows.length}\n` +
+        `Final rows: ${finalRows.length}`;
+
+      resultCard.style.display = "block";
+      downloadBtn.disabled = false;
+      statusText.textContent = "Completed";
+    } catch (err) {
+      console.error(err);
+      alert("Action failed. Please check CSV compatibility.");
     }
-
-    if (actions.removeMissingEmail) {
-      finalRows = window.removeMissingEmail(headers, finalRows).withEmail;
-    }
-
-    if (actions.removeDuplicates) {
-      finalRows = window.removeDuplicates(headers, finalRows).rows;
-    }
-
-    if (actions.extractHouseNumbers) {
-      const col = document.getElementById("houseSourceColumn").value;
-      const result = window.extractHouseNumbers(headers, finalRows, col);
-      headers = result.headers;
-      finalRows = result.rows;
-    }
-
-    if (actions.createColumn) {
-      const name = document.getElementById("newColumnName").value.trim();
-      const result = window.createNewColumn(headers, finalRows, name);
-      headers = result.headers;
-      finalRows = result.rows;
-    }
-
-    progressBar.style.width = "100%";
-    progressPercent.textContent = "100%";
-
-    resultSummary.textContent =
-      `Columns: ${headers.length}\n` +
-      `Original rows: ${rows.length}\n` +
-      `Final rows: ${finalRows.length}`;
-
-    resultCard.style.display = "block";
-    downloadBtn.disabled = false;
-    statusText.textContent = "Completed";
   };
 
   reader.readAsText(file);
@@ -302,7 +216,15 @@ runBtn.addEventListener("click", () => {
 // DOWNLOAD
 // ======================
 downloadBtn.addEventListener("click", () => {
-  if (finalRows.length) {
-    downloadCSV("processed.csv", headers, finalRows);
-  }
+  if (!finalRows.length) return;
+
+  const csv = [headers, ...finalRows].map(r => r.join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "processed.csv";
+  a.click();
+  URL.revokeObjectURL(url);
 });
