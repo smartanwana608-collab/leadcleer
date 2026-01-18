@@ -1,5 +1,5 @@
 // ======================
-// PROMPT ENGINE — FINAL STABLE
+// PROMPT ENGINE — FINAL V4 (PRODUCTION SAFE)
 // ======================
 
 // DOM
@@ -71,17 +71,17 @@ function renderCSVPreview(tableEl, headers, rows, limit = 10) {
 }
 
 // ======================
-// PROMPT DETECTOR
+// PROMPT DETECTOR (MATCHES UI WORDING)
 // ======================
 function detectActions(prompt) {
   const p = prompt.toLowerCase();
 
   return {
-    filterRealEstate: p.includes("real estate"),
+    filterRealEstate: p.includes("filter real estate"),
     removeMissingEmail: p.includes("missing email"),
     removeDuplicates: p.includes("duplicate"),
     extractHouseNumbers: p.includes("house"),
-    createColumn: p.includes("new column")
+    createColumn: p.includes("new column"),
   };
 }
 
@@ -96,7 +96,7 @@ function renderDetectedActions(actions) {
     removeMissingEmail: "Remove rows missing email",
     removeDuplicates: "Remove duplicate contacts",
     extractHouseNumbers: "Extract house numbers",
-    createColumn: "Create a new column"
+    createColumn: "Create a new column",
   };
 
   let found = false;
@@ -118,6 +118,7 @@ function renderDetectedActions(actions) {
 // ======================
 function updateRunButton() {
   runBtn.disabled = !(promptInput.value.trim() && fileInput.files.length);
+  runBtn.classList.toggle("enabled", !runBtn.disabled);
 }
 
 promptInput.addEventListener("input", () => {
@@ -128,14 +129,14 @@ promptInput.addEventListener("input", () => {
 fileInput.addEventListener("change", updateRunButton);
 
 // ======================
-// RUN PROMPT (NORMALIZED)
+// RUN PROMPT (SAFE EXECUTION)
 // ======================
 runBtn.addEventListener("click", () => {
   const prompt = promptInput.value.trim();
   const file = fileInput.files[0];
 
   if (!prompt) {
-    alert("Please enter a prompt.");
+    alert("Please enter a prompt first.");
     return;
   }
 
@@ -146,69 +147,86 @@ runBtn.addEventListener("click", () => {
 
   const actions = detectActions(prompt);
 
+  if (!Object.values(actions).some(Boolean)) {
+    alert(
+      "No valid action detected.\n\n" +
+      "Please use one of the supported actions shown below the prompt box."
+    );
+    return;
+  }
+
+  // Reset UI
+  progressBar.style.width = "0%";
+  progressPercent.textContent = "0%";
+  downloadBtn.disabled = true;
+  resultCard.style.display = "none";
+
   statusBox.style.display = "block";
-  statusText.textContent = "Processing CSV…";
-  progressBar.style.width = "10%";
-  progressPercent.textContent = "10%";
+  statusText.textContent = "Reading CSV…";
 
   const reader = new FileReader();
 
   reader.onload = e => {
     parseCSV(e.target.result);
 
+    progressBar.style.width = "25%";
+    progressPercent.textContent = "25%";
+
     previewCard.style.display = "block";
     renderCSVPreview(csvPreviewTable, headers, rows);
 
     finalRows = [...rows];
-    let currentHeaders = [...headers];
 
     try {
+      statusText.textContent = "Applying selected actions…";
+      progressBar.style.width = "50%";
+      progressPercent.textContent = "50%";
+
       if (actions.filterRealEstate) {
-        const res = window.filterRealEstateAgents(currentHeaders, finalRows);
-        finalRows = res.agents;
+        const result = window.filterRealEstateAgents(headers, finalRows);
+        finalRows = result.agents;
       }
 
-      progressBar.style.width = "40%";
-      progressPercent.textContent = "40%";
-
       if (actions.removeMissingEmail) {
-        const res = window.removeMissingEmail(currentHeaders, finalRows);
-        finalRows = res.withEmail;
+        const result = window.removeMissingEmail(headers, finalRows);
+        finalRows = result.withEmail;
       }
 
       if (actions.removeDuplicates) {
-        const res = window.removeDuplicates(currentHeaders, finalRows);
-        finalRows = res.rows;
+        const result = window.removeDuplicates(headers, finalRows);
+        finalRows = result.rows;
       }
 
       if (actions.extractHouseNumbers) {
-        const res = window.extractHouseNumbers(currentHeaders, finalRows);
-        currentHeaders = res.headers;
-        finalRows = res.rows;
+        const result = window.extractHouseNumbers(headers, finalRows);
+        headers = result.headers;
+        finalRows = result.rows;
       }
 
       if (actions.createColumn) {
-        const res = window.createNewColumn(currentHeaders, finalRows);
-        currentHeaders = res.headers;
-        finalRows = res.rows;
+        const result = window.createNewColumn(headers, finalRows);
+        headers = result.headers;
+        finalRows = result.rows;
       }
 
       progressBar.style.width = "100%";
       progressPercent.textContent = "100%";
 
       resultSummary.textContent =
-        `Columns: ${currentHeaders.length}\n` +
+        `Columns: ${headers.length}\n` +
         `Original rows: ${rows.length}\n` +
         `Final rows: ${finalRows.length}`;
 
       resultCard.style.display = "block";
       downloadBtn.disabled = false;
       statusText.textContent = "Completed";
-
-      headers = currentHeaders;
     } catch (err) {
       console.error(err);
-      alert("Processing failed. Please check your CSV structure.");
+      alert(
+        "This action cannot be applied to this CSV.\n\n" +
+        "Please choose another action or upload a different file."
+      );
+      statusText.textContent = "Failed";
     }
   };
 
