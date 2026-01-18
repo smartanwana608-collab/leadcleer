@@ -1,83 +1,50 @@
 // ===================================
-// SPLIT CSV BY COLUMN VALUE (ACTION)
+// SPLIT CSV BY COLUMN (ACTION)
 // ===================================
 
 /**
- * Split CSV rows by a column's values
+ * Find column index by name (case-insensitive)
+ */
+function findColumnIndex(headers, columnName) {
+  return headers.findIndex(
+    h => h.toLowerCase().trim() === columnName.toLowerCase().trim()
+  );
+}
+
+/**
+ * Split rows by column value
  *
- * @param {Array} headers - CSV headers
- * @param {Array} rows - CSV data rows
- * @param {String} columnName - Column to split by
- *
- * @returns {Object} - { value1: rows[], value2: rows[] }
+ * @param {Array} headers
+ * @param {Array} rows
+ * @param {String} columnName
+ * @returns {Object}
  */
 function splitByColumn(headers, rows, columnName) {
-  const columnIndex = headers.findIndex(
-    h => h.toLowerCase() === columnName.toLowerCase()
-  );
+  const columnIndex = findColumnIndex(headers, columnName);
 
   if (columnIndex === -1) {
-    throw new Error(`Column "${columnName}" not found`);
+    throw new Error(`Column "${columnName}" not found in CSV`);
   }
 
-  const result = {};
+  const groups = {};
 
   rows.forEach(row => {
-    let value = row[columnIndex] || "EMPTY";
+    const key = row[columnIndex] || "EMPTY";
 
-    value = value.toString().trim();
-    if (!value) value = "EMPTY";
-
-    if (!result[value]) {
-      result[value] = [];
+    if (!groups[key]) {
+      groups[key] = [];
     }
 
-    result[value].push(row);
+    groups[key].push(row);
   });
 
   return {
     headers,
-    groups: result
+    groups
   };
-}
-
-/**
- * Generate safe filename from value
- */
-function formatFilename(base, value) {
-  return `${base}_${value
-    .toLowerCase()
-    .replace(/\s+/g, "_")
-    .replace(/[^a-z0-9_]/g, "")}.csv`;
-}
-
-/**
- * Download grouped CSVs
- */
-function downloadSplitCSVs(baseName, headers, groups) {
-  Object.keys(groups).forEach(value => {
-    const rows = groups[value];
-    const filename = formatFilename(baseName, value);
-
-    const csv = [headers, ...rows]
-      .map(r => r.join(","))
-      .join("\n");
-
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  });
 }
 
 // ===================================
 // EXPORT FOR PROMPT ENGINE
 // ===================================
 window.splitByColumn = splitByColumn;
-window.downloadSplitCSVs = downloadSplitCSVs;
