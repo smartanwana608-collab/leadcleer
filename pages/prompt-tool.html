@@ -69,7 +69,8 @@
     <button id="runBtn" class="btn" disabled>Run Prompt</button>
 
     <div id="statusBox" style="display:none; margin-top:12px;">
-      <strong>Status:</strong> <span id="statusText"></span>
+      <strong>Status:</strong>
+      <span id="statusText"></span>
     </div>
   </div>
 
@@ -84,7 +85,13 @@
   <!-- RESULTS -->
   <div class="card" id="resultCard" style="display:none;">
     <h2>Results</h2>
-    <p id="resultSummary" style="white-space:pre-line;"></p>
+
+    <p style="color:#059669; font-weight:600; margin-top:6px;">
+      Your file is ready. Download below.
+    </p>
+
+    <p id="resultSummary" style="white-space:pre-line; margin-top:10px;"></p>
+
     <button id="downloadResult" class="download-btn enabled">
       Download Processed CSV
     </button>
