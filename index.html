@@ -2,68 +2,128 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Leadcleer — Clean Data. Clearly.</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <meta name="description" content="Leadcleer helps you clean, filter, and organize CSV contact data securely and efficiently."/>
+  <title>Leadcleer — Clean & Organize CSV Data Instantly</title>
 
-  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="/assets/css/main.css" />
+  <meta name="description" content="Leadcleer helps you clean, filter, and organize CSV lead data instantly. Privacy-first. No signup required." />
+
+  <!-- FAVICON (TEXT-BASED FOR NOW) -->
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🟣</text></svg>" />
+
+  <link rel="stylesheet" href="assets/css/main.css" />
 </head>
 
 <body>
 
-<header class="navbar">
-  <div class="nav-inner">
-    <img src="/assets/logo/leadcleer-logo.svg" alt="Leadcleer Logo" class="logo"/>
+<!-- ================= HEADER ================= -->
+<header class="site-header">
+  <div class="nav">
+    <div class="logo">
+      <span class="logo-dot">●</span> Leadcleer
+    </div>
 
-    <nav class="nav-actions">
-      <a href="/pages/prompt-tool.html" class="btn ghost">Open Tools</a>
-      <a href="/pages/prompt-tool.html" class="btn primary">Get Started Free</a>
-    </nav>
+    <div class="nav-actions">
+      <a href="tools/prompt-tool.html" class="btn-outline">Open Tools</a>
+    </div>
   </div>
 </header>
 
-<main>
+<!-- ================= HERO ================= -->
+<section class="hero">
+  <div class="hero-inner">
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-content">
-      <h1>
-        Clean Your <span>CSV Data</span><br/>
-        Without the Headache
-      </h1>
+    <h1>
+      Clean & Organize<br />
+      <span class="gradient-text">CSV Data Instantly</span>
+    </h1>
 
-      <p>
-        Leadcleer helps you filter, organize, and clean contact data —
-        safely, locally, and with zero data storage.
-      </p>
+    <p class="hero-subtitle">
+      Leadcleer helps you filter leads, remove duplicates,
+      extract addresses, and prepare clean data — all inside your browser.
+    </p>
 
-      <div class="hero-cta">
-        <a href="/pages/prompt-tool.html" class="btn primary large">Open Tools</a>
-        <a href="/pages/prompt-tool.html" class="btn ghost large">Get Started Free</a>
-      </div>
-
-      <p class="hero-note">
-        No sign-up required · Data never leaves your browser
-      </p>
+    <div class="hero-actions">
+      <a href="tools/prompt-tool.html" class="btn-primary">Get Started Free</a>
+      <a href="#how" class="btn-secondary">How It Works</a>
     </div>
 
-    <!-- Glow Decoration -->
-    <div class="hero-glow"></div>
-  </section>
+    <p class="hero-note">
+      🔒 100% privacy-first. No uploads. No tracking. No signup.
+    </p>
 
-</main>
+  </div>
+</section>
 
-<footer class="footer">
+<!-- ================= HOW IT WORKS ================= -->
+<section class="how-it-works" id="how">
+  <div class="how-inner">
+
+    <h2>How Leadcleer Works</h2>
+    <p class="how-subtitle">
+      Three simple steps to clean professional-grade CSV data.
+    </p>
+
+    <div class="how-grid">
+
+      <div class="how-card">
+        <div class="how-step">1</div>
+        <h3>Upload CSV</h3>
+        <p>
+          Upload any CSV file containing leads, contacts, or raw data.
+          Everything stays on your device.
+        </p>
+      </div>
+
+      <div class="how-card">
+        <div class="how-step">2</div>
+        <h3>Choose Action</h3>
+        <p>
+          Filter real estate agents, remove duplicates,
+          fix addresses, or split files by column.
+        </p>
+      </div>
+
+      <div class="how-card">
+        <div class="how-step">3</div>
+        <h3>Download Clean Data</h3>
+        <p>
+          Instantly download your cleaned CSV.
+          Ready for CRM, campaigns, or analysis.
+        </p>
+      </div>
+
+    </div>
+
+    <p class="how-security">
+      🔐 Leadcleer never stores or sends your data anywhere.
+    </p>
+
+  </div>
+</section>
+
+<!-- ================= CTA ================= -->
+<section class="cta">
+  <h2>Start Cleaning Your Data Today</h2>
+  <p>Use Leadcleer for free. Upgrade later when you need more power.</p>
+
+  <a href="tools/prompt-tool.html" class="btn-primary">Open CSV Tool</a>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer class="site-footer">
   <p>
-    © <span id="year"></span> Leadcleer · Built for secure data handling
+    © 2026 Leadcleer ·
+    <a href="#">Privacy</a> ·
+    <a href="#">Terms</a> ·
+    <a href="mailto:smartanwana608@gmail.com">Contact</a>
+  </p>
+
+  <p class="footer-note">
+    Leadcleer runs entirely in your browser. Your data is always yours.
   </p>
 </footer>
-
-<script>
-  document.getElementById("year").textContent = new Date().getFullYear();
-</script>
 
 </body>
 </html>
