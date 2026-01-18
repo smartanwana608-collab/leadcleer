@@ -3,13 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <title>Pricing — Leadcleer</title>
-
-  <meta
-    name="description"
-    content="Leadcleer pricing plans. Start free today. Paid plans coming soon."
-  />
+  <title>Pricing | Leadcleer</title>
 
   <link rel="stylesheet" href="/assets/css/main.css" />
 </head>
@@ -19,100 +13,77 @@
 <!-- ================= NAV ================= -->
 <header class="nav">
   <div class="nav-container">
-    <div class="logo">Leadcleer</div>
-    <nav>
+    <a href="/index.html" class="logo">Leadcleer</a>
+
+    <nav class="nav-links">
       <a href="/index.html">Home</a>
-      <a href="/index.html#tools">Tools</a>
+      <a href="/pages/features.html">Features</a>
       <a href="/pages/how-it-works.html">How It Works</a>
       <a href="/pages/pricing.html" class="active">Pricing</a>
-      <a href="mailto:smartanwana608@gmail.com">Contact</a>
+      <a href="/pages/contact.html">Contact</a>
     </nav>
   </div>
 </header>
 
 <!-- ================= HERO ================= -->
-<section class="hero">
-  <div class="hero-content">
-    <h1>Simple, Honest <span>Pricing</span></h1>
-    <p>
-      Start free today.  
-      Upgrade only when you need more power.
-    </p>
-  </div>
-  <div class="hero-glow"></div>
-</section>
-
-<!-- ================= PRICING ================= -->
-<section class="features">
-  <h2>Choose Your Plan</h2>
-
-  <div class="feature-grid">
-
-    <!-- FREE -->
-    <div class="feature-card">
-      <h3>Free</h3>
-      <p style="font-size:2rem; font-weight:700;">$0</p>
-      <p>Perfect for individuals and small datasets.</p>
-
-      <ul style="margin-top:16px; line-height:1.8; color:#4b5563;">
-        <li>✔ Unlimited CSV uploads</li>
-        <li>✔ Remove duplicates</li>
-        <li>✔ Remove missing emails</li>
-        <li>✔ Filter real estate agents</li>
-        <li>✔ Browser-only processing</li>
-      </ul>
-
-      <a href="/pages/prompt-tool.html" class="btn primary" style="margin-top:20px;">
-        Get Started Free
-      </a>
-    </div>
-
-    <!-- PRO -->
-    <div class="feature-card" style="opacity:0.7;">
-      <h3>Pro</h3>
-      <p style="font-size:2rem; font-weight:700;">Coming Soon</p>
-      <p>For professionals and teams.</p>
-
-      <ul style="margin-top:16px; line-height:1.8; color:#4b5563;">
-        <li>✔ Everything in Free</li>
-        <li>✔ Advanced filtering rules</li>
-        <li>✔ Custom column logic</li>
-        <li>✔ Large file optimization</li>
-        <li>✔ Priority feature access</li>
-      </ul>
-
-      <button class="btn secondary" style="margin-top:20px;" disabled>
-        Not Available Yet
-      </button>
-    </div>
-
-    <!-- TEAM -->
-    <div class="feature-card" style="opacity:0.6;">
-      <h3>Team</h3>
-      <p style="font-size:2rem; font-weight:700;">Planned</p>
-      <p>For agencies and organizations.</p>
-
-      <ul style="margin-top:16px; line-height:1.8; color:#4b5563;">
-        <li>✔ Team access</li>
-        <li>✔ Shared workflows</li>
-        <li>✔ Usage analytics</li>
-        <li>✔ Dedicated support</li>
-      </ul>
-
-      <button class="btn secondary" style="margin-top:20px;" disabled>
-        Planned
-      </button>
-    </div>
-
-  </div>
-</section>
-
-<!-- ================= NOTICE ================= -->
-<section class="disclaimer">
+<section class="pricing-hero">
+  <h1>Simple, Transparent Pricing</h1>
   <p>
-    <strong>Note:</strong> Leadcleer is currently free to use while we continue
-    building advanced features. Pricing plans will be introduced later.
-    Early users will receive priority access.
+    Leadcleer is currently free while we build advanced Pro features.
+    No accounts. No subscriptions. No hidden fees.
+  </p>
+</section>
+
+<!-- ================= PRICING CARDS ================= -->
+<section class="pricing-section">
+
+  <!-- FREE PLAN -->
+  <div class="pricing-card active">
+    <h2>Free</h2>
+    <p class="price">$0</p>
+    <p class="price-note">Available now</p>
+
+    <ul class="pricing-features">
+      <li>✔ Filter Real Estate Agents</li>
+      <li>✔ Prompt-Based CSV Tool</li>
+      <li>✔ Unlimited CSV processing</li>
+      <li>✔ Browser-based (local processing)</li>
+      <li>✔ No account required</li>
+    </ul>
+
+    <a href="/pages/features.html" class="btn primary">
+      Get Started Free
+    </a>
+  </div>
+
+  <!-- PRO PLAN -->
+  <div class="pricing-card pro disabled">
+    <span class="badge pro">Coming Soon</span>
+
+    <h2>Pro</h2>
+    <p class="price">—</p>
+    <p class="price-note">In development</p>
+
+    <ul class="pricing-features">
+      <li>🔒 Advanced lead intelligence</li>
+      <li>🔒 Email validation & scoring</li>
+      <li>🔒 Bulk data enrichment</li>
+      <li>🔒 Saved workflows</li>
+      <li>🔒 Priority features & updates</li>
+    </ul>
+
+    <button class="btn disabled-btn" disabled>
+      Coming Soon
+    </button>
+  </div>
+
+</section>
+
+<!-- ================= NOTE ================= -->
+<section class="pricing-note">
+  <p>
+    Pro features are actively being developed.
+    Early users will receive access benefits and launch discounts when Pro becomes available.
   </p>
 </section>
 
@@ -133,8 +104,7 @@
     <div class="footer-links">
       <div class="footer-column">
         <h4>Product</h4>
-        <a href="/pages/prompt-tool.html">Get Started Free</a>
-        <a href="/index.html#tools">Tools</a>
+        <a href="/pages/features.html">Features</a>
         <a href="/pages/how-it-works.html">How It Works</a>
       </div>
 
