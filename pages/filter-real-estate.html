@@ -1,305 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Filter Real Estate Agents | CSV Automation Tools</title>
 
-<title>Filter Real Estate Agents | CSV Automation Tools</title>
-
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-body {
-  font-family: system-ui, sans-serif;
-  background: #f4f6f8;
-  color: #1f2937;
-}
-
-header {
-  background: #fff;
-  padding: 22px;
-  text-align: center;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-main {
-  max-width: 1000px;
-  margin: 40px auto;
-  padding: 0 20px;
-}
-
-.card {
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 14px;
-  padding: 32px;
-  margin-bottom: 30px;
-}
-
-.upload-box {
-  border: 2px dashed #e5e7eb;
-  border-radius: 12px;
-  padding: 40px;
-  text-align: center;
-}
-
-.file-info {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 16px;
-}
-
-.info-item {
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  padding: 16px;
-}
-
-.btn {
-  background: #2563eb;
-  color: #fff;
-  padding: 14px 26px;
-  border-radius: 10px;
-  border: none;
-  font-weight: 600;
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.btn.enabled {
-  opacity: 1;
-  cursor: pointer;
-}
-
-.results {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 16px;
-  margin-top: 20px;
-}
-
-.result-box {
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  padding: 20px;
-  text-align: center;
-}
-
-.downloads {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 16px;
-  margin-top: 30px;
-}
-
-.download-btn {
-  background: #111827;
-  color: #fff;
-  padding: 14px;
-  border-radius: 10px;
-  border: none;
-  font-weight: 600;
-  opacity: 0.3;
-  cursor: not-allowed;
-}
-
-.download-btn.enabled {
-  opacity: 1;
-  cursor: pointer;
-}
-
-/* KEYWORD EDITOR */
-.keyword-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 16px;
-}
-
-.keyword {
-  background: #e5e7eb;
-  padding: 8px 12px;
-  border-radius: 999px;
-  font-size: 0.85rem;
-}
-
-.keyword button {
-  background: none;
-  border: none;
-  margin-left: 6px;
-  cursor: pointer;
-}
-
-/* PREVIEW TABLE */
-.table-wrap {
-  overflow-x: auto;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  margin-top: 10px;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.85rem;
-}
-
-th, td {
-  padding: 10px;
-  border-bottom: 1px solid #e5e7eb;
-  white-space: nowrap;
-}
-
-th {
-  background: #f9fafb;
-  font-weight: 600;
-}
-</style>
+  <link rel="stylesheet" href="../assets/css/main.css" />
 </head>
 
 <body>
 
-<header>
+<header class="tool-header">
   <h1>Filter Real Estate Agents</h1>
   <p>Upload a CSV and split real estate agents from other contacts</p>
 </header>
 
-<main>
+<main class="tool-container">
 
-<!-- Upload -->
-<div class="card">
-  <div class="upload-box">
-    <input type="file" id="csvFile" accept=".csv" />
-  </div>
-</div>
-
-<!-- File info -->
-<div class="card">
-  <div class="file-info">
-    <div class="info-item" id="fileName">File name: —</div>
-    <div class="info-item" id="rowCount">Total rows: —</div>
-    <div class="info-item" id="columnCount">Detected columns: —</div>
-  </div>
-</div>
-
-<!-- Keyword editor -->
-<div class="card">
-  <h2>Detection Keywords</h2>
-  <div id="keywordList" class="keyword-list"></div>
-  <input id="newKeyword" placeholder="Add keyword" />
-  <button id="addKeywordBtn">Add</button>
-</div>
-
-<!-- Analysis -->
-<div class="card">
-  <button id="analyzeBtn" class="btn">Analyze CSV</button>
-
-  <div class="results">
-    <div class="result-box">
-      <strong id="agentCount">—</strong> Agents
-    </div>
-    <div class="result-box">
-      <strong id="otherCount">—</strong> Others
+  <!-- Upload -->
+  <div class="card">
+    <div class="upload-box">
+      <input type="file" id="csvFile" accept=".csv" />
     </div>
   </div>
 
-  <div class="downloads">
-    <button id="downloadAgents" class="download-btn">Download Agents</button>
-    <button id="downloadOthers" class="download-btn">Download Others</button>
-  </div>
-</div>
-
-<!-- ✅ PREVIEW RESULTS CARD (NEW) -->
-<div class="card">
-  <h2>Preview Results</h2>
-  <p>Showing first 10 rows from each group.</p>
-
-  <h3>Real Estate Agents</h3>
-  <div class="table-wrap">
-    <table id="agentsPreview"></table>
+  <!-- File Info -->
+  <div class="card">
+    <div class="file-info">
+      <div class="info-item" id="fileName">File name: —</div>
+      <div class="info-item" id="rowCount">Total rows: —</div>
+      <div class="info-item" id="columnCount">Detected columns: —</div>
+    </div>
   </div>
 
-  <h3 style="margin-top:30px;">Other Contacts</h3>
-  <div class="table-wrap">
-    <table id="othersPreview"></table>
+  <!-- Keyword Editor -->
+  <div class="card">
+    <h2>Detection Keywords</h2>
+    <p>Email-based detection. Edit keywords below.</p>
+
+    <div id="keywordList" class="keyword-list"></div>
+
+    <div class="keyword-add">
+      <input id="newKeyword" placeholder="Add keyword (e.g. realtor)" />
+      <button id="addKeywordBtn">Add</button>
+    </div>
   </div>
-</div>
+
+  <!-- Analyze -->
+  <div class="card">
+    <button id="analyzeBtn" class="btn">Analyze CSV</button>
+
+    <!-- Progress -->
+    <div id="progressWrap">
+      <p>Processing: <span id="progressPercent">0%</span></p>
+      <div id="progressBarBg">
+        <div id="progressBar"></div>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div class="results">
+      <div class="result-box">
+        <strong id="agentCount">—</strong>
+        Real Estate Agents
+      </div>
+      <div class="result-box">
+        <strong id="otherCount">—</strong>
+        Other Contacts
+      </div>
+    </div>
+  </div>
+
+  <!-- Preview -->
+  <div class="card">
+    <h2>Preview Results</h2>
+    <p>First 10 rows from each group.</p>
+
+    <h3>Real Estate Agents</h3>
+    <div class="table-wrap">
+      <table id="agentsPreview"></table>
+    </div>
+
+    <h3 style="margin-top:30px;">Other Contacts</h3>
+    <div class="table-wrap">
+      <table id="othersPreview"></table>
+    </div>
+  </div>
+
+  <!-- Downloads -->
+  <div class="card">
+    <div class="downloads">
+      <button id="downloadAgents" class="download-btn">Download Agents CSV</button>
+      <button id="downloadOthers" class="download-btn">Download Other Contacts CSV</button>
+    </div>
+  </div>
 
 </main>
 
-<script>
-const fileInput = document.getElementById("csvFile");
-const analyzeBtn = document.getElementById("analyzeBtn");
-
-const agentCountEl = document.getElementById("agentCount");
-const otherCountEl = document.getElementById("otherCount");
-
-const agentsPreview = document.getElementById("agentsPreview");
-const othersPreview = document.getElementById("othersPreview");
-
-let headers = [];
-let dataRows = [];
-let agentRows = [];
-let otherRows = [];
-
-let keywords = ["realtor","realty","broker","brokerage","kw","coldwell","century","sotheby","estate"];
-
-fileInput.onchange = e => {
-  const reader = new FileReader();
-  reader.onload = ev => {
-    const rows = ev.target.result.trim().split("\n").map(r => r.split(","));
-    headers = rows[0];
-    dataRows = rows.slice(1);
-    analyzeBtn.classList.add("enabled");
-  };
-  reader.readAsText(e.target.files[0]);
-};
-
-analyzeBtn.onclick = () => {
-  agentRows = [];
-  otherRows = [];
-
-  const emailIndexes = headers
-    .map((h,i)=>h.toLowerCase().includes("email")?i:null)
-    .filter(i=>i!==null);
-
-  dataRows.forEach(r=>{
-    const isAgent = emailIndexes.some(i =>
-      keywords.some(k => r[i]?.toLowerCase().includes(k))
-    );
-    isAgent ? agentRows.push(r) : otherRows.push(r);
-  });
-
-  agentCountEl.textContent = agentRows.length;
-  otherCountEl.textContent = otherRows.length;
-
-  renderPreview(agentsPreview, agentRows);
-  renderPreview(othersPreview, otherRows);
-};
-
-function renderPreview(table, rows) {
-  table.innerHTML = "";
-  const head = document.createElement("tr");
-  headers.forEach(h=>{
-    const th=document.createElement("th");
-    th.textContent=h;
-    head.appendChild(th);
-  });
-  table.appendChild(head);
-
-  rows.slice(0,10).forEach(r=>{
-    const tr=document.createElement("tr");
-    r.forEach(c=>{
-      const td=document.createElement("td");
-      td.textContent=c;
-      tr.appendChild(td);
-    });
-    table.appendChild(tr);
-  });
-}
-</script>
-
+<script src="../assets/js/filter-agents.js"></script>
 </body>
 </html>
