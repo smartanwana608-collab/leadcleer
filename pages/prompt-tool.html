@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>Prompt-Based CSV Tool | CSV Contact Tools</title>
+
+  <meta
+    name="description"
+    content="Describe what you want to do with your CSV file and let the system process it."
+  />
+
   <link rel="stylesheet" href="../assets/css/main.css" />
 </head>
 
@@ -38,6 +44,9 @@
         <li>Extract house numbers</li>
         <li>Create a new column</li>
       </ul>
+      <p style="margin-top:8px; font-size:0.9rem; color:#6b7280;">
+        Tip: Use the same wording in your prompt.
+      </p>
     </div>
   </div>
 
@@ -60,14 +69,23 @@
     <button id="runBtn" class="btn" disabled>Run Prompt</button>
 
     <div id="statusBox" style="display:none; margin-top:12px;">
-      <strong>Status:</strong>
-      <span id="statusText"></span>
+      <strong>Status:</strong> <span id="statusText"></span>
+
+      <!-- Progress -->
+      <div style="margin-top:10px;">
+        <div style="background:#e5e7eb; border-radius:8px; overflow:hidden;">
+          <div id="progressBar"
+               style="height:10px; width:0%; background:#2563eb; transition:width 0.3s;">
+          </div>
+        </div>
+        <small id="progressPercent">0%</small>
+      </div>
     </div>
   </div>
 
   <!-- PREVIEW -->
   <div class="card" id="previewCard" style="display:none;">
-    <h2>CSV Preview</h2>
+    <h2>CSV Preview (First 10 Rows)</h2>
     <div class="table-wrap">
       <table id="csvPreviewTable"></table>
     </div>
@@ -76,10 +94,9 @@
   <!-- RESULTS -->
   <div class="card" id="resultCard" style="display:none;">
     <h2>Results</h2>
-
     <p id="resultSummary" style="white-space:pre-line;"></p>
 
-    <button id="downloadResult" class="download-btn enabled">
+    <button id="downloadResult" class="download-btn" disabled>
       Download Processed CSV
     </button>
   </div>
