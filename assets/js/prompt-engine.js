@@ -1,5 +1,5 @@
 // ======================
-// PROMPT ENGINE — CLEAN V1 (UX FIXED)
+// PROMPT ENGINE — STABLE UX V1
 // ======================
 
 // DOM
@@ -80,11 +80,10 @@ function renderCSVPreview(tableEl, headers, rows, limit = 10) {
 }
 
 // ======================
-// PROMPT DETECTOR
+// PROMPT DETECTION
 // ======================
 function detectActions(prompt) {
   const p = prompt.toLowerCase();
-
   return {
     filterRealEstate: p.includes("real estate"),
     removeMissingEmail: p.includes("missing email"),
@@ -94,11 +93,10 @@ function detectActions(prompt) {
 }
 
 // ======================
-// ACTION LIST UI
+// ACTION UI
 // ======================
 function renderDetectedActions(actions) {
   detectedActionsList.innerHTML = "";
-
   const map = {
     filterRealEstate: "Filter real estate agents",
     removeMissingEmail: "Remove rows missing email",
@@ -107,7 +105,6 @@ function renderDetectedActions(actions) {
   };
 
   let found = false;
-
   Object.keys(actions).forEach(key => {
     if (actions[key]) {
       found = true;
@@ -121,7 +118,7 @@ function renderDetectedActions(actions) {
 }
 
 // ======================
-// ENABLE RUN BUTTON LOGIC
+// ENABLE RUN BUTTON
 // ======================
 function updateRunButton() {
   runBtn.disabled = !(promptInput.value.trim() && fileInput.files.length);
@@ -143,10 +140,7 @@ runBtn.addEventListener("click", () => {
   const file = fileInput.files[0];
   if (!prompt || !file) return;
 
-  // Disable button while processing
   runBtn.disabled = true;
-  runBtn.textContent = "Processing…";
-
   statusBox.style.display = "block";
   statusText.textContent = "Reading CSV file…";
 
@@ -154,8 +148,8 @@ runBtn.addEventListener("click", () => {
   reader.onload = e => {
     parseCSV(e.target.result);
 
-    previewCard.style.display = "block";
     renderCSVPreview(csvPreviewTable, headers, rows);
+    previewCard.style.display = "block";
 
     statusText.textContent = "Applying selected actions…";
 
@@ -165,28 +159,26 @@ runBtn.addEventListener("click", () => {
     if (actions.filterRealEstate) {
       finalRows = window.filterRealEstateAgents(headers, finalRows).agents;
     }
-
     if (actions.removeMissingEmail) {
       finalRows = window.removeMissingEmail(headers, finalRows).withEmail;
     }
-
     if (actions.removeDuplicates) {
       finalRows = window.removeDuplicates(finalRows);
     }
-
     if (actions.extractHouseNumbers) {
       finalRows = window.extractHouseNumbers(headers, finalRows).rows;
     }
 
+    // ✅ FINISH
+    statusText.textContent = "Completed";
+
     resultSummary.textContent =
-      `Original rows: ${rows.length}\n→ Final rows: ${finalRows.length}`;
+      `Columns detected: ${headers.length}\n` +
+      `Original rows: ${rows.length}\n` +
+      `Rows after actions: ${finalRows.length}`;
 
     resultCard.style.display = "block";
-    statusText.textContent = "Processing complete — ready to download";
-
-    // Re-enable button
     runBtn.disabled = false;
-    runBtn.textContent = "Run Prompt";
   };
 
   reader.readAsText(file);
