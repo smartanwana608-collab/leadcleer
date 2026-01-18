@@ -3,7 +3,7 @@
 // ===================================
 
 /**
- * Detect email columns automatically
+ * Detect email column indexes automatically
  */
 function findEmailColumns(headers) {
   return headers
@@ -13,64 +13,22 @@ function findEmailColumns(headers) {
 }
 
 /**
- * Check if row contains at least one email
- */
-function rowHasEmail(row, emailIndexes) {
-  return emailIndexes.some(index => {
-    const value = row[index];
-    return value && value.toString().trim() !== "";
-  });
-}
-
-/**
- * Remove rows missing email
+ * Remove rows that do not contain an email
  *
  * @param {Array} headers
  * @param {Array} rows
- * @returns {Object}
+ * @returns {Array} filtered rows
  */
-function removeMissingEmail(headers, rows) {
+export function removeMissingEmail(headers, rows) {
   const emailIndexes = findEmailColumns(headers);
 
-  if (!emailIndexes.length) {
-    throw new Error("No email column found");
-  }
+  // If no email column exists, return rows unchanged
+  if (!emailIndexes.length) return rows;
 
-  const withEmail = [];
-  const withoutEmail = [];
-
-  rows.forEach(row => {
-    rowHasEmail(row, emailIndexes)
-      ? withEmail.push(row)
-      : withoutEmail.push(row);
-  });
-
-  return {
-    headers,
-    withEmail,
-    withoutEmail
-  };
+  return rows.filter(row =>
+    emailIndexes.some(index => {
+      const value = row[index];
+      return value && value.toString().trim() !== "";
+    })
+  );
 }
-
-/**
- * Download CSV helper
- */
-function downloadEmailResults(headers, rows, filename) {
-  const csv = [headers, ...rows].map(r => r.join(",")).join("\n");
-  const blob = new Blob([csv], { type: "text/csv" });
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-
-// ===================================
-// EXPORT FOR PROMPT ENGINE
-// ===================================
-window.removeMissingEmail = removeMissingEmail;
-window.downloadEmailResults = downloadEmailResults;
