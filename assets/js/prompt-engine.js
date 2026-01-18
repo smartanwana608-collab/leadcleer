@@ -1,5 +1,5 @@
 // ======================
-// PROMPT ENGINE — CLEAN V1
+// PROMPT ENGINE — CLEAN V1 (UX FIXED)
 // ======================
 
 // DOM
@@ -141,11 +141,14 @@ fileInput.addEventListener("change", updateRunButton);
 runBtn.addEventListener("click", () => {
   const prompt = promptInput.value.trim();
   const file = fileInput.files[0];
-
   if (!prompt || !file) return;
 
+  // Disable button while processing
+  runBtn.disabled = true;
+  runBtn.textContent = "Processing…";
+
   statusBox.style.display = "block";
-  statusText.textContent = "Reading CSV…";
+  statusText.textContent = "Reading CSV file…";
 
   const reader = new FileReader();
   reader.onload = e => {
@@ -153,6 +156,8 @@ runBtn.addEventListener("click", () => {
 
     previewCard.style.display = "block";
     renderCSVPreview(csvPreviewTable, headers, rows);
+
+    statusText.textContent = "Applying selected actions…";
 
     const actions = detectActions(prompt);
     finalRows = [...rows];
@@ -177,7 +182,11 @@ runBtn.addEventListener("click", () => {
       `Original rows: ${rows.length}\n→ Final rows: ${finalRows.length}`;
 
     resultCard.style.display = "block";
-    statusText.textContent = "Completed";
+    statusText.textContent = "Processing complete — ready to download";
+
+    // Re-enable button
+    runBtn.disabled = false;
+    runBtn.textContent = "Run Prompt";
   };
 
   reader.readAsText(file);
