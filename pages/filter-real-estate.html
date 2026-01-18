@@ -9,12 +9,7 @@
   <meta name="description" content="Upload a CSV file and filter real estate agents based on email patterns while keeping all columns intact." />
 
   <style>
-    /* RESET */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -28,7 +23,6 @@
       --gray: #6b7280;
       --border: #e5e7eb;
       --card: #ffffff;
-      --muted: #9ca3af;
     }
 
     header {
@@ -36,16 +30,6 @@
       border-bottom: 1px solid var(--border);
       padding: 22px;
       text-align: center;
-    }
-
-    header h1 {
-      font-size: 1.6rem;
-    }
-
-    header p {
-      color: var(--gray);
-      font-size: 0.95rem;
-      margin-top: 4px;
     }
 
     main {
@@ -62,26 +46,12 @@
       margin-bottom: 30px;
     }
 
-    .card h2 {
-      font-size: 1.3rem;
-      margin-bottom: 10px;
-    }
-
-    .card p {
-      color: var(--gray);
-      margin-bottom: 20px;
-    }
-
     .upload-box {
       border: 2px dashed var(--border);
       border-radius: 12px;
       padding: 40px 20px;
       text-align: center;
       background: #fafafa;
-    }
-
-    input[type="file"] {
-      margin-top: 14px;
     }
 
     .file-info {
@@ -99,31 +69,9 @@
       font-size: 0.9rem;
     }
 
-    .rules {
-      background: #f9fafb;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 20px;
-      font-size: 0.9rem;
-    }
-
-    .rules ul {
-      margin-top: 10px;
-      padding-left: 18px;
-    }
-
-    .rules li {
-      margin-bottom: 6px;
-    }
-
-    .action {
-      margin-top: 30px;
-      text-align: right;
-    }
-
     .btn {
       background: var(--primary);
-      color: #ffffff;
+      color: #fff;
       padding: 14px 26px;
       border-radius: 10px;
       border: none;
@@ -153,24 +101,6 @@
       text-align: center;
     }
 
-    .result-box strong {
-      font-size: 1.4rem;
-      display: block;
-    }
-
-    .download-btn {
-      margin-top: 20px;
-      background: #111827;
-      color: #fff;
-      padding: 14px 26px;
-      border-radius: 10px;
-      border: none;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: not-allowed;
-      opacity: 0.3;
-    }
-
     footer {
       text-align: center;
       font-size: 0.85rem;
@@ -192,69 +122,91 @@
   <!-- UPLOAD -->
   <div class="card">
     <h2>Upload CSV File</h2>
-    <p>All columns will remain intact. No data is deleted.</p>
-
     <div class="upload-box">
-      <strong>Select CSV file</strong><br />
-      <input type="file" />
+      <input type="file" id="csvFile" accept=".csv" />
     </div>
   </div>
 
   <!-- FILE OVERVIEW -->
   <div class="card">
     <h2>File Overview</h2>
-
     <div class="file-info">
-      <div class="info-item">File name: —</div>
-      <div class="info-item">Total rows: —</div>
-      <div class="info-item">Detected columns: —</div>
-    </div>
-  </div>
-
-  <!-- DETECTION RULES -->
-  <div class="card">
-    <h2>Detection Rules</h2>
-    <p>This feature identifies real estate agents using email patterns.</p>
-
-    <div class="rules">
-      <strong>Current rules:</strong>
-      <ul>
-        <li>Email contains known real estate keywords (e.g. realtor, realty, brokerage)</li>
-        <li>Main email or secondary email field is scanned</li>
-        <li>No company column required</li>
-      </ul>
+      <div class="info-item" id="fileName">File name: —</div>
+      <div class="info-item" id="rowCount">Total rows: —</div>
+      <div class="info-item" id="columnCount">Detected columns: —</div>
     </div>
   </div>
 
   <!-- ACTION -->
   <div class="card">
     <h2>Analyze & Results</h2>
-    <p>Run analysis to separate agents from other contacts.</p>
 
-    <div class="action">
-      <button class="btn">Analyze CSV</button>
-    </div>
+    <button id="analyzeBtn" class="btn">Analyze CSV</button>
 
     <div class="results">
       <div class="result-box">
-        <strong>—</strong>
+        <strong id="agentCount">—</strong>
         Real Estate Agents Found
       </div>
 
       <div class="result-box">
-        <strong>—</strong>
+        <strong id="nonAgentCount">—</strong>
         Other Contacts
       </div>
     </div>
-
-    <button class="download-btn">Download Agent CSV (Coming Soon)</button>
   </div>
 
 </main>
 
-<footer>
-  © 2026 CSV Automation Tools
-</footer>
-<script src="../assets/js/filter-agents.js"></script>
+<footer>© 2026 CSV Automation Tools</footer>
+
+<script>
+  const fileInput = document.getElementById("csvFile");
+  const analyzeBtn = document.getElementById("analyzeBtn");
+
+  const fileNameEl = document.getElementById("fileName");
+  const rowCountEl = document.getElementById("rowCount");
+  const columnCountEl = document.getElementById("columnCount");
+
+  const agentCountEl = document.getElementById("agentCount");
+  const nonAgentCountEl = document.getElementById("nonAgentCount");
+
+  const keywords = ["realtor", "realty", "broker", "kw", "coldwell", "century", "sotheby"];
+
+  let rows = [];
+
+  fileInput.addEventListener("change", () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    fileNameEl.textContent = "File name: " + file.name;
+
+    const reader = new FileReader();
+    reader.onload = e => {
+      rows = e.target.result.trim().split("\n").map(r => r.split(","));
+      rowCountEl.textContent = "Total rows: " + (rows.length - 1);
+      columnCountEl.textContent = "Detected columns: " + rows[0].length;
+      analyzeBtn.classList.add("enabled");
+    };
+    reader.readAsText(file);
+  });
+
+  analyzeBtn.addEventListener("click", () => {
+    if (!rows.length) return;
+
+    let agents = 0;
+    let others = 0;
+
+    rows.slice(1).forEach(row => {
+      const rowText = row.join(" ").toLowerCase();
+      const isAgent = keywords.some(k => rowText.includes(k));
+      isAgent ? agents++ : others++;
+    });
+
+    agentCountEl.textContent = agents;
+    nonAgentCountEl.textContent = others;
+  });
+</script>
+
 </body>
 </html>
