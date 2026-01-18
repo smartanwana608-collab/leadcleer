@@ -52,7 +52,7 @@
     </div>
   </div>
 
-  <!-- ✅ DETECTED ACTIONS -->
+  <!-- DETECTED ACTIONS -->
   <div class="card" id="detectedActionsCard" style="display:none;">
     <h2>Detected Actions</h2>
     <p>The system understands the following actions from your prompt:</p>
@@ -66,6 +66,16 @@
 
     <div class="upload-box">
       <input type="file" id="csvFile" accept=".csv" />
+    </div>
+  </div>
+
+  <!-- CSV PREVIEW -->
+  <div class="card" id="previewCard" style="display:none;">
+    <h2>CSV Preview</h2>
+    <p>Showing first 10 rows.</p>
+
+    <div class="table-wrap">
+      <table id="csvPreviewTable"></table>
     </div>
   </div>
 
