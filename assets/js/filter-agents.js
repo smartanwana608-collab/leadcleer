@@ -51,21 +51,67 @@ function downloadCSV(filename, headers, rows) {
 }
 
 // ======================
+// PREVIEW RENDERER
+// ======================
+function renderPreview(tableEl, headers, rows, limit = 10) {
+  tableEl.innerHTML = "";
+
+  if (!rows.length) {
+    tableEl.innerHTML = "<tr><td>No data</td></tr>";
+    return;
+  }
+
+  const thead = document.createElement("thead");
+  const headRow = document.createElement("tr");
+
+  headers.forEach(h => {
+    const th = document.createElement("th");
+    th.textContent = h;
+    headRow.appendChild(th);
+  });
+
+  thead.appendChild(headRow);
+  tableEl.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
+
+  rows.slice(0, limit).forEach(row => {
+    const tr = document.createElement("tr");
+    row.forEach(cell => {
+      const td = document.createElement("td");
+      td.textContent = cell;
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+
+  tableEl.appendChild(tbody);
+}
+
+// ======================
 // MAIN
 // ======================
 document.addEventListener("DOMContentLoaded", () => {
-  const fileInput = document.querySelector('input[type="file"]');
-  const analyzeBtn = document.querySelector(".btn");
+  // File + buttons
+  const fileInput = document.getElementById("csvFile");
+  const analyzeBtn = document.getElementById("analyzeBtn");
 
+  // Info
   const fileNameEl = document.getElementById("fileName");
   const rowCountEl = document.getElementById("rowCount");
   const columnCountEl = document.getElementById("columnCount");
 
+  // Results
   const agentCountEl = document.getElementById("agentCount");
   const otherCountEl = document.getElementById("otherCount");
 
+  // Downloads
   const downloadAgentsBtn = document.getElementById("downloadAgents");
   const downloadOthersBtn = document.getElementById("downloadOthers");
+
+  // Preview tables
+  const agentsPreviewTable = document.getElementById("agentsPreview");
+  const othersPreviewTable = document.getElementById("othersPreview");
 
   // Keyword UI
   const keywordListEl = document.getElementById("keywordList");
@@ -81,9 +127,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // KEYWORD UI
   // ======================
   function renderKeywords() {
-    if (!keywordListEl) return;
-
     keywordListEl.innerHTML = "";
+
     keywords.forEach((kw, index) => {
       const tag = document.createElement("div");
       tag.className = "keyword";
@@ -96,7 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     keywordListEl.querySelectorAll("button").forEach(btn => {
       btn.addEventListener("click", () => {
-        const index = parseInt(btn.dataset.index);
+        const index = Number(btn.dataset.index);
         keywords.splice(index, 1);
         saveKeywords();
         renderKeywords();
@@ -104,17 +149,15 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  if (addKeywordBtn) {
-    addKeywordBtn.addEventListener("click", () => {
-      const value = newKeywordInput.value.trim().toLowerCase();
-      if (!value || keywords.includes(value)) return;
+  addKeywordBtn.addEventListener("click", () => {
+    const value = newKeywordInput.value.trim().toLowerCase();
+    if (!value || keywords.includes(value)) return;
 
-      keywords.push(value);
-      saveKeywords();
-      newKeywordInput.value = "";
-      renderKeywords();
-    });
-  }
+    keywords.push(value);
+    saveKeywords();
+    newKeywordInput.value = "";
+    renderKeywords();
+  });
 
   renderKeywords();
 
@@ -169,6 +212,11 @@ document.addEventListener("DOMContentLoaded", () => {
       agentCountEl.textContent = agents.length;
       otherCountEl.textContent = nonAgents.length;
 
+      // Render previews
+      renderPreview(agentsPreviewTable, headers, agents);
+      renderPreview(othersPreviewTable, headers, nonAgents);
+
+      // Enable downloads
       downloadAgentsBtn.classList.add("enabled");
       downloadOthersBtn.classList.add("enabled");
 
@@ -182,10 +230,14 @@ document.addEventListener("DOMContentLoaded", () => {
   // DOWNLOADS
   // ======================
   downloadAgentsBtn.addEventListener("click", () => {
-    if (agents.length) downloadCSV("real_estate_agents.csv", headers, agents);
+    if (agents.length) {
+      downloadCSV("real_estate_agents.csv", headers, agents);
+    }
   });
 
   downloadOthersBtn.addEventListener("click", () => {
-    if (nonAgents.length) downloadCSV("other_contacts.csv", headers, nonAgents);
+    if (nonAgents.length) {
+      downloadCSV("other_contacts.csv", headers, nonAgents);
+    }
   });
 });
