@@ -7,6 +7,7 @@
   --muted: #9ca3af;
 }
 
+/* ================= RESET ================= */
 * {
   margin: 0;
   padding: 0;
@@ -20,7 +21,7 @@ body {
   line-height: 1.6;
 }
 
-/* NAV */
+/* ================= NAV ================= */
 .nav {
   border-bottom: 1px solid #1f2333;
   padding: 20px 40px;
@@ -36,19 +37,22 @@ body {
   font-size: 22px;
   font-weight: 700;
   color: var(--violet);
+  text-decoration: none;
 }
 
 .nav-links a {
   margin-left: 24px;
   text-decoration: none;
   color: var(--muted);
+  font-weight: 500;
 }
 
-.nav-links a:hover {
-  color: var(--text);
+.nav-links a:hover,
+.nav-links a.active {
+  color: var(--violet);
 }
 
-/* HERO */
+/* ================= HERO ================= */
 .hero {
   position: relative;
   padding: 120px 20px 140px;
@@ -83,11 +87,20 @@ body {
   flex-wrap: wrap;
 }
 
+.hero-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, var(--violet-glow), transparent 60%);
+  z-index: -1;
+}
+
+/* ================= BUTTONS ================= */
 .btn {
   padding: 14px 26px;
   border-radius: 10px;
   text-decoration: none;
   font-weight: 600;
+  display: inline-block;
 }
 
 .btn.primary {
@@ -100,74 +113,106 @@ body {
   color: var(--text);
 }
 
-.hero-glow {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at center, var(--violet-glow), transparent 60%);
-  z-index: -1;
+.disabled-btn {
+  background: #2a2a2a;
+  color: #aaa;
+  cursor: not-allowed;
+  border: none;
 }
 
-/* SECTIONS */
+/* ================= SECTIONS ================= */
 section {
   padding: 100px 20px;
 }
 
 h2 {
-  text-align: center;
   font-size: 2rem;
-  margin-bottom: 60px;
+  margin-bottom: 20px;
 }
 
-/* FEATURES */
-.feature-grid {
+/* ================= PAGE HERO ================= */
+.page-hero {
+  max-width: 900px;
+  margin: 80px auto 60px;
+  text-align: center;
+  padding: 0 20px;
+}
+
+.page-hero h1 {
+  font-size: 42px;
+  margin-bottom: 12px;
+}
+
+.page-hero p {
+  color: var(--muted);
+  font-size: 18px;
+}
+
+/* ================= FEATURES PAGE GRID ================= */
+.features-grid-page {
   max-width: 1100px;
-  margin: auto;
+  margin: 0 auto 100px;
+  padding: 0 20px;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 28px;
 }
 
-.feature-card {
-  background: var(--card);
+.feature-card-page {
+  background: linear-gradient(180deg, #14172a, #0d0f1d);
+  border-radius: 14px;
   padding: 28px;
-  border-radius: 16px;
-}
-
-/* TOOLS */
-.tool-grid {
-  max-width: 1100px;
-  margin: auto;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 24px;
-}
-
-.tool-card {
-  background: var(--card);
-  padding: 32px;
-  border-radius: 18px;
-}
-
-/* HOW IT WORKS */
-.steps {
+  position: relative;
   display: flex;
-  justify-content: center;
-  gap: 60px;
-  flex-wrap: wrap;
+  flex-direction: column;
 }
 
-.step {
-  text-align: center;
-  max-width: 220px;
+.feature-card-page h2 {
+  margin-bottom: 10px;
 }
 
-.step span {
-  font-size: 2rem;
+.feature-desc {
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.feature-card-page ul {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 24px;
+}
+
+.feature-card-page ul li {
+  margin-bottom: 8px;
+}
+
+/* ================= BADGES ================= */
+.feature-badge {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+.feature-badge.beta {
+  background: rgba(107,78,255,0.15);
   color: var(--violet);
-  font-weight: 700;
 }
 
-/* FOOTER */
+.feature-badge.pro {
+  background: rgba(255,215,0,0.15);
+  color: gold;
+}
+
+/* ================= PRO / DISABLED ================= */
+.feature-card-page.pro {
+  opacity: 0.6;
+}
+
+/* ================= FOOTER ================= */
 .footer {
   border-top: 1px solid #1f2333;
   padding: 60px 20px 30px;
@@ -222,111 +267,12 @@ h2 {
   font-size: 0.9rem;
 }
 
-/* MOBILE */
-@media (max-width: 768px) {
-  .nav {
-    padding: 16px 20px;
-  }
-
-  .nav-links {
-    display: none;
-  }
-
-  .hero {
-    padding: 90px 20px;
-  }
-
-  section {
-    padding: 80px 20px;
-  }
-
-  .footer-links {
-    flex-direction: column;
-    gap: 32px;
-  }
-}
-/* =========================
-   PRO BADGE
-   ========================= */
-.pro-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: linear-gradient(135deg, #6b4eff, #9b7bff);
-  color: #ffffff;
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  padding: 4px 8px;
-  border-radius: 999px;
-  text-transform: uppercase;
-  box-shadow: 0 0 12px rgba(107, 78, 255, 0.6);
-}
-
-/* =========================
-   PRO FEATURE CARD STATE
-   ========================= */
-.feature-card.pro {
-  position: relative;
-  opacity: 0.9;
-  border: 1px dashed #c4b5fd;
-}
-
-.feature-card.pro::after {
-  content: "Coming Soon";
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  font-size: 0.7rem;
-  color: #6b7280;
-}
-
-/* =========================
-   DISABLED BUTTON (PRO)
-   ========================= */
-.btn.pro-disabled {
-  background: #e5e7eb;
-  color: #9ca3af;
-  cursor: not-allowed;
-  pointer-events: none;
-  border: 1px solid #d1d5db;
-}
-
-/* =========================
-   PRO NOTICE TEXT
-   ========================= */
-.pro-note {
-  margin-top: 12px;
-  font-size: 0.85rem;
-  color: #6b7280;
-}
-/* =========================
-   PRICING PAGE
-   ========================= */
-
+/* ================= PRICING ================= */
 .pricing-hero {
   text-align: center;
   padding: 80px 20px 60px;
   background: radial-gradient(circle at top, #6b4eff22, transparent 60%);
 }
-
-.pricing-hero h1 {
-  font-size: 2.5rem;
-  color: #111827;
-  margin-bottom: 12px;
-}
-
-.pricing-hero p {
-  max-width: 680px;
-  margin: 0 auto;
-  color: #4b5563;
-  font-size: 1.05rem;
-  line-height: 1.6;
-}
-
-/* =========================
-   PRICING SECTION
-   ========================= */
 
 .pricing-section {
   max-width: 1100px;
@@ -337,138 +283,41 @@ h2 {
   gap: 30px;
 }
 
-/* =========================
-   PRICING CARD
-   ========================= */
-
 .pricing-card {
   background: #ffffff;
-  border: 1px solid #e5e7eb;
   border-radius: 18px;
   padding: 36px 30px;
   position: relative;
   display: flex;
   flex-direction: column;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-.pricing-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.08);
-}
-
-/* ACTIVE (FREE) */
 .pricing-card.active {
-  border: 2px solid #6b4eff;
+  border: 2px solid var(--violet);
 }
-
-/* PRO (DISABLED) */
-.pricing-card.pro.disabled {
-  opacity: 0.85;
-}
-
-/* =========================
-   PRICING TEXT
-   ========================= */
-
-.pricing-card h2 {
-  font-size: 1.6rem;
-  margin-bottom: 8px;
-  color: #111827;
-}
-
-.price {
-  font-size: 3rem;
-  font-weight: 800;
-  color: #6b4eff;
-  margin: 12px 0 4px;
-}
-
-.price-note {
-  font-size: 0.9rem;
-  color: #6b7280;
-  margin-bottom: 24px;
-}
-
-/* =========================
-   FEATURES LIST
-   ========================= */
-
-.pricing-features {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 30px;
-}
-
-.pricing-features li {
-  margin-bottom: 12px;
-  font-size: 0.95rem;
-  color: #374151;
-}
-
-/* =========================
-   BADGES
-   ========================= */
-
-.badge {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  padding: 6px 12px;
-  border-radius: 999px;
-  text-transform: uppercase;
-}
-
-.badge.pro {
-  background: #111827;
-  color: #ffffff;
-}
-
-.badge.free {
-  background: #e0e7ff;
-  color: #4338ca;
-}
-
-/* =========================
-   BUTTONS
-   ========================= */
-
-.pricing-card .btn {
-  margin-top: auto;
-  text-align: center;
-}
-
-.disabled-btn {
-  background: #e5e7eb;
-  color: #9ca3af;
-  cursor: not-allowed;
-}
-
-/* =========================
-   PRICING NOTE
-   ========================= */
 
 .pricing-note {
   text-align: center;
   padding: 40px 20px 80px;
   color: #6b7280;
-  font-size: 0.95rem;
-  max-width: 720px;
-  margin: 0 auto;
 }
 
-/* =========================
-   MOBILE TWEAKS
-   ========================= */
-
-@media (max-width: 600px) {
-  .pricing-hero h1 {
-    font-size: 2rem;
+/* ================= MOBILE ================= */
+@media (max-width: 768px) {
+  .nav {
+    padding: 16px 20px;
   }
 
-  .price {
-    font-size: 2.5rem;
+  .nav-links {
+    display: none;
+  }
+
+  section {
+    padding: 80px 20px;
+  }
+
+  .footer-links {
+    flex-direction: column;
+    gap: 32px;
   }
 }
