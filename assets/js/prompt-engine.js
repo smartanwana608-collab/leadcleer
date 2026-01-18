@@ -1,5 +1,5 @@
 // ======================
-// PROMPT ENGINE — FINAL V1 (LOCKED & STABLE)
+// PROMPT ENGINE — STEP 2 (SMART PARAMETERS UI)
 // ======================
 
 // DOM
@@ -30,7 +30,6 @@ const progressPercent = document.getElementById("progressPercent");
 let headers = [];
 let rows = [];
 let finalRows = [];
-let splitGroups = null;
 let actionParams = {};
 
 // ======================
@@ -42,21 +41,6 @@ function parseCSV(text) {
   rows = lines.slice(1).map(r => r.split(","));
 }
 
-function downloadCSV(filename, headers, rows) {
-  const csv = [headers, ...rows].map(r => r.join(",")).join("\n");
-  const blob = new Blob([csv], { type: "text/csv" });
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-// ======================
-// PREVIEW
-// ======================
 function renderCSVPreview(tableEl, headers, rows, limit = 10) {
   tableEl.innerHTML = "";
 
@@ -88,7 +72,7 @@ function renderCSVPreview(tableEl, headers, rows, limit = 10) {
 }
 
 // ======================
-// ACTION DETECTOR (LOCKED)
+// ACTION DETECTOR (LOCKED SET)
 // ======================
 function detectActions(prompt) {
   const p = prompt.toLowerCase();
@@ -99,14 +83,13 @@ function detectActions(prompt) {
     filterRealEstate: p.includes("real estate"),
     fixAddresses: p.includes("fix address"),
     removeMissingEmail: p.includes("remove") && p.includes("missing email"),
-    findMissingEmail: p.includes("find") && p.includes("missing email"),
     removeDuplicates: p.includes("duplicate"),
     splitByColumn: p.includes("split"),
   };
 }
 
 // ======================
-// ACTION LIST UI
+// DETECTED ACTIONS UI
 // ======================
 function renderDetectedActions(actions) {
   detectedActionsList.innerHTML = "";
@@ -118,7 +101,6 @@ function renderDetectedActions(actions) {
     filterRealEstate: "Filter real estate agents",
     fixAddresses: "Fix addresses",
     removeMissingEmail: "Remove rows missing email",
-    findMissingEmail: "Find contacts missing email",
     removeDuplicates: "Remove duplicate contacts",
     splitByColumn: "Split CSV by column",
   };
@@ -137,16 +119,16 @@ function renderDetectedActions(actions) {
 }
 
 // ======================
-// ACTION PARAMETERS UI (MINIMAL)
+// SMART ACTION PARAMETERS UI
 // ======================
 function renderActionParams(actions) {
   actionParamsFields.innerHTML = "";
   actionParams = {};
 
-  // CREATE COLUMN
+  // CREATE COLUMN → TEXT INPUT
   if (actions.createColumn) {
     const label = document.createElement("label");
-    label.textContent = "New column name:";
+    label.textContent = "New column name";
 
     const input = document.createElement("input");
     input.type = "text";
@@ -165,10 +147,14 @@ function renderActionParams(actions) {
     return;
   }
 
-  // SPLIT BY COLUMN
-  if (actions.splitByColumn && headers.length) {
+  // COLUMN SELECTOR (shared)
+  if (
+    actions.splitByColumn ||
+    actions.extractHouseNumbers ||
+    actions.fixAddresses
+  ) {
     const label = document.createElement("label");
-    label.textContent = "Select column to split by:";
+    label.textContent = "Select column";
 
     const select = document.createElement("select");
     select.style.width = "100%";
@@ -182,7 +168,7 @@ function renderActionParams(actions) {
     });
 
     select.addEventListener("change", () => {
-      actionParams.splitColumn = select.value;
+      actionParams.column = select.value;
       updateRunButton();
     });
 
@@ -196,17 +182,24 @@ function renderActionParams(actions) {
 }
 
 // ======================
-// ENABLE RUN BUTTON
+// RUN BUTTON VALIDATION
 // ======================
 function updateRunButton() {
   const hasPrompt = promptInput.value.trim();
   const hasFile = fileInput.files.length;
 
   const actions = detectActions(promptInput.value.trim());
-  const needsColumnName = actions.createColumn && !actionParams.columnName;
-  const needsSplitColumn = actions.splitByColumn && !actionParams.splitColumn;
 
-  runBtn.disabled = !(hasPrompt && hasFile) || needsColumnName || needsSplitColumn;
+  const needsColumnName =
+    actions.createColumn && !actionParams.columnName;
+
+  const needsColumn =
+    (actions.splitByColumn ||
+      actions.extractHouseNumbers ||
+      actions.fixAddresses) &&
+    !actionParams.column;
+
+  runBtn.disabled = !(hasPrompt && hasFile) || needsColumnName || needsColumn;
   runBtn.classList.toggle("enabled", !runBtn.disabled);
 }
 
@@ -215,39 +208,24 @@ function updateRunButton() {
 // ======================
 promptInput.addEventListener("input", () => {
   const actions = detectActions(promptInput.value.trim());
-  const found = renderDetectedActions(actions);
+  renderDetectedActions(actions);
   renderActionParams(actions);
   updateRunButton();
-
-  if (!found && promptInput.value.trim()) {
-    statusBox.style.display = "block";
-    statusText.textContent = "No supported action detected.";
-  }
 });
 
 fileInput.addEventListener("change", updateRunButton);
 
 // ======================
-// RUN PROMPT
+// RUN PROMPT (SAFE)
 // ======================
 runBtn.addEventListener("click", () => {
-  const prompt = promptInput.value.trim();
-  const file = fileInput.files[0];
-
-  if (!prompt || !file) return;
-
-  const actions = detectActions(prompt);
-  if (!renderDetectedActions(actions)) {
-    alert("No supported action detected.");
-    return;
-  }
-
   statusBox.style.display = "block";
   statusText.textContent = "Processing CSV…";
-  progressBar.style.width = "20%";
-  progressPercent.textContent = "20%";
+  progressBar.style.width = "30%";
+  progressPercent.textContent = "30%";
 
   const reader = new FileReader();
+
   reader.onload = e => {
     parseCSV(e.target.result);
 
@@ -256,7 +234,27 @@ runBtn.addEventListener("click", () => {
 
     finalRows = [...rows];
 
+    const actions = detectActions(promptInput.value.trim());
+
     try {
+      if (actions.createColumn) {
+        const r = window.createNewColumn(headers, finalRows);
+        headers = r.headers;
+        finalRows = r.rows;
+      }
+
+      if (actions.extractHouseNumbers) {
+        const r = window.extractHouseNumbers(headers, finalRows);
+        headers = r.headers;
+        finalRows = r.rows;
+      }
+
+      if (actions.fixAddresses) {
+        const r = window.fixAddresses(headers, finalRows, actionParams.column);
+        headers = r.headers;
+        finalRows = r.rows;
+      }
+
       if (actions.filterRealEstate) {
         finalRows = window.filterRealEstateAgents(headers, finalRows).agents;
       }
@@ -265,35 +263,13 @@ runBtn.addEventListener("click", () => {
         finalRows = window.removeMissingEmail(headers, finalRows).withEmail;
       }
 
-      if (actions.findMissingEmail) {
-        finalRows = window.findContactsMissingEmail(headers, finalRows).missingEmailRows;
-      }
-
       if (actions.removeDuplicates) {
         finalRows = window.removeDuplicates(headers, finalRows).rows;
       }
 
-      if (actions.extractHouseNumbers) {
-        const result = window.extractHouseNumbers(headers, finalRows);
-        headers = result.headers;
-        finalRows = result.rows;
-      }
-
-      if (actions.fixAddresses) {
-        const result = window.fixAddresses(headers, finalRows);
-        headers = result.headers;
-        finalRows = result.rows;
-      }
-
-      if (actions.createColumn) {
-        const result = window.createNewColumn(headers, finalRows);
-        headers = result.headers;
-        finalRows = result.rows;
-      }
-
       if (actions.splitByColumn) {
-        const result = window.splitByColumn(headers, finalRows, actionParams.splitColumn);
-        splitGroups = result.groups;
+        alert("Split by column runs as a multi-download step next.");
+        return;
       }
 
       progressBar.style.width = "100%";
@@ -308,12 +284,11 @@ runBtn.addEventListener("click", () => {
       downloadBtn.disabled = false;
       statusText.textContent = "Completed";
     } catch (err) {
-      console.error(err);
-      alert(err.message || "Action failed on this CSV.");
+      alert(err.message || "Action failed.");
     }
   };
 
-  reader.readAsText(file);
+  reader.readAsText(fileInput.files[0]);
 });
 
 // ======================
@@ -321,5 +296,14 @@ runBtn.addEventListener("click", () => {
 // ======================
 downloadBtn.addEventListener("click", () => {
   if (!finalRows.length) return;
-  downloadCSV("processed.csv", headers, finalRows);
+
+  const csv = [headers, ...finalRows].map(r => r.join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "processed.csv";
+  a.click();
+  URL.revokeObjectURL(url);
 });
