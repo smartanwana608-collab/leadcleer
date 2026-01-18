@@ -1,10 +1,10 @@
 // ======================
-// PROMPT ENGINE — FINAL V1
+// PROMPT ENGINE — CLEAN V2 (STABLE)
 // ======================
 
-// ======================
-// DOM REFERENCES
-// ======================
+// ----------------------
+// DOM
+// ----------------------
 const promptInput = document.getElementById("promptInput");
 const fileInput = document.getElementById("csvFile");
 const runBtn = document.getElementById("runBtn");
@@ -22,9 +22,9 @@ const resultCard = document.getElementById("resultCard");
 const resultSummary = document.getElementById("resultSummary");
 const downloadBtn = document.getElementById("downloadResult");
 
-// ======================
+// ----------------------
 // DATA
-// ======================
+// ----------------------
 let headers = [];
 let rows = [];
 let finalRows = [];
@@ -51,7 +51,7 @@ function downloadCSV(filename, headers, rows) {
 }
 
 // ======================
-// CSV PREVIEW
+// PREVIEW
 // ======================
 function renderCSVPreview(tableEl, headers, rows, limit = 10) {
   tableEl.innerHTML = "";
@@ -84,39 +84,34 @@ function renderCSVPreview(tableEl, headers, rows, limit = 10) {
 }
 
 // ======================
-// PROMPT → ACTION PARSER (WITH PARAMETERS)
+// PROMPT DETECTOR
 // ======================
 function detectActions(prompt) {
   const p = prompt.toLowerCase();
 
-  const splitMatch = p.match(/split (csv )?by column ([a-z0-9 _-]+)/i);
-  const extractHouseMatch = p.match(/extract house numbers from ([a-z0-9 _-]+)/i);
-  const createColumnMatch = p.match(/create (a )?new column ([a-z0-9 _-]+)/i);
-
   return {
-    filterRealEstate: p.includes("real estate"),
+    filterRealEstate: p.includes("filter real estate"),
     removeMissingEmail: p.includes("missing email"),
     removeDuplicates: p.includes("duplicate"),
-
-    splitByColumn: splitMatch ? splitMatch[2].trim() : null,
-    extractHouseNumbers: extractHouseMatch ? extractHouseMatch[1].trim() : null,
-    createNewColumn: createColumnMatch ? createColumnMatch[2].trim() : null
+    extractHouseNumbers:
+      p.includes("extract house numbers") && !p.includes("from "),
+    createNewColumn:
+      p.includes("create a new column") && !p.match(/column\s+\w+/),
   };
 }
 
 // ======================
-// DETECTED ACTIONS UI
+// ACTION LIST UI
 // ======================
 function renderDetectedActions(actions) {
   detectedActionsList.innerHTML = "";
 
   const map = {
-    filterRealEstate: () => "Filter real estate agents",
-    removeMissingEmail: () => "Remove rows missing email",
-    removeDuplicates: () => "Remove duplicate contacts",
-    splitByColumn: col => `Split CSV by column "${col}"`,
-    extractHouseNumbers: col => `Extract house numbers from "${col}"`,
-    createNewColumn: col => `Create new column "${col}"`
+    filterRealEstate: "Filter real estate agents",
+    removeMissingEmail: "Remove rows missing email",
+    removeDuplicates: "Remove duplicate contacts",
+    extractHouseNumbers: "Extract house numbers",
+    createNewColumn: "Create a new column",
   };
 
   let found = false;
@@ -125,13 +120,33 @@ function renderDetectedActions(actions) {
     if (actions[key]) {
       found = true;
       const li = document.createElement("li");
-      li.textContent = map[key](actions[key]);
+      li.textContent = map[key];
       detectedActionsList.appendChild(li);
     }
   });
 
   detectedActionsCard.style.display = found ? "block" : "none";
-  return found;
+}
+
+// ======================
+// PARAMETER VALIDATION ✅
+// ======================
+function validateActionParameters(actions) {
+  const errors = [];
+
+  if (actions.extractHouseNumbers) {
+    errors.push(
+      '❌ "Extract house numbers" needs a column.\nExample: Extract house numbers from Address'
+    );
+  }
+
+  if (actions.createNewColumn) {
+    errors.push(
+      '❌ "Create a new column" needs a name.\nExample: Create a new column Status'
+    );
+  }
+
+  return errors;
 }
 
 // ======================
@@ -157,21 +172,16 @@ runBtn.addEventListener("click", () => {
   const prompt = promptInput.value.trim();
   const file = fileInput.files[0];
 
-  if (!prompt) {
-    alert("Please enter a prompt first.");
-    return;
-  }
-
-  if (!file) {
-    alert("Please upload a CSV file.");
+  if (!prompt || !file) {
+    alert("Please enter a prompt and upload a CSV file.");
     return;
   }
 
   const actions = detectActions(prompt);
-  const hasAction = renderDetectedActions(actions);
+  const paramErrors = validateActionParameters(actions);
 
-  if (!hasAction) {
-    alert("No valid action detected. Please use supported action wording.");
+  if (paramErrors.length) {
+    alert(paramErrors.join("\n\n"));
     return;
   }
 
@@ -180,64 +190,42 @@ runBtn.addEventListener("click", () => {
 
   const reader = new FileReader();
   reader.onload = e => {
-    parseCSV(e.target.result);
+    try {
+      parseCSV(e.target.result);
 
-    // Preview original CSV
-    previewCard.style.display = "block";
-    renderCSVPreview(csvPreviewTable, headers, rows);
+      previewCard.style.display = "block";
+      renderCSVPreview(csvPreviewTable, headers, rows);
 
-    statusText.textContent = "Applying selected actions…";
+      finalRows = [...rows];
+      statusText.textContent = "Applying selected actions…";
 
-    finalRows = [...rows];
+      if (actions.filterRealEstate) {
+        finalRows =
+          window.filterRealEstateAgents(headers, finalRows).agents;
+      }
 
-    // ======================
-    // APPLY ACTIONS (ORDERED)
-    // ======================
-    if (actions.filterRealEstate) {
-      const result = window.filterRealEstateAgents(headers, finalRows);
-      finalRows = result.agents;
-    }
+      if (actions.removeMissingEmail) {
+        finalRows =
+          window.removeMissingEmail(headers, finalRows).withEmail;
+      }
 
-    if (actions.removeMissingEmail) {
-      const result = window.removeMissingEmail(headers, finalRows);
-      finalRows = result.withEmail;
-    }
+      if (actions.removeDuplicates) {
+        finalRows =
+          window.removeDuplicates(headers, finalRows).rows;
+      }
 
-    if (actions.removeDuplicates) {
-      const result = window.removeDuplicates(headers, finalRows);
-      finalRows = result.rows;
-    }
+      resultSummary.textContent =
+        `Rows before: ${rows.length}\nRows after: ${finalRows.length}\nColumns: ${headers.length}`;
 
-    if (actions.extractHouseNumbers) {
-      const result = window.extractHouseNumbers(
-        headers,
-        finalRows,
-        actions.extractHouseNumbers
+      resultCard.style.display = "block";
+      statusText.textContent = "Completed";
+    } catch (err) {
+      alert(
+        "An error occurred while applying actions.\n\n" +
+          err.message
       );
-      headers = result.headers;
-      finalRows = result.rows;
+      statusBox.style.display = "none";
     }
-
-    if (actions.createNewColumn) {
-      const result = window.createNewColumn(
-        headers,
-        finalRows,
-        actions.createNewColumn
-      );
-      headers = result.headers;
-      finalRows = result.rows;
-    }
-
-    // ======================
-    // RESULTS
-    // ======================
-    resultSummary.textContent =
-      `Columns: ${headers.length}\n` +
-      `Original rows: ${rows.length}\n` +
-      `Final rows: ${finalRows.length}`;
-
-    resultCard.style.display = "block";
-    statusText.textContent = "Completed";
   };
 
   reader.readAsText(file);
@@ -247,9 +235,7 @@ runBtn.addEventListener("click", () => {
 // DOWNLOAD
 // ======================
 downloadBtn.addEventListener("click", () => {
-  if (!finalRows.length) {
-    alert("Nothing to download.");
-    return;
+  if (finalRows.length) {
+    downloadCSV("processed.csv", headers, finalRows);
   }
-  downloadCSV("processed.csv", headers, finalRows);
 });
