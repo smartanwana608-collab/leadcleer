@@ -1,10 +1,9 @@
 // ===================================
-// FILTER REAL ESTATE AGENTS (ACTION)
+// FILTER REAL ESTATE AGENTS (ACTION) — SAFE V1
 // ===================================
 
 /**
  * Default real estate keywords
- * (can be overridden later by prompt engine)
  */
 const DEFAULT_RE_KEYWORDS = [
   "realtor",
@@ -56,8 +55,15 @@ function filterRealEstateAgents(headers, rows, customKeywords = []) {
 
   const emailIndexes = findEmailColumns(headers);
 
+  // ✅ SAFE EXIT: no email column
   if (!emailIndexes.length) {
-    throw new Error("No email column found");
+    return {
+      headers,
+      agents: [],
+      nonAgents: rows,
+      agentCount: 0,
+      nonAgentCount: rows.length
+    };
   }
 
   const agents = [];
