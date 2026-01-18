@@ -13,6 +13,10 @@ const resultCard = document.getElementById("resultCard");
 const resultSummary = document.getElementById("resultSummary");
 const downloadBtn = document.getElementById("downloadResult");
 
+// ✅ DETECTED ACTIONS DOM
+const detectedActionsCard = document.getElementById("detectedActionsCard");
+const detectedActionsList = document.getElementById("detectedActionsList");
+
 let headers = [];
 let rows = [];
 let resultRows = [];
@@ -51,6 +55,34 @@ function detectActions(prompt) {
     extractHouseNumber: p.includes("house"),
     fixAddress: p.includes("address"),
   };
+}
+
+// ======================
+// RENDER DETECTED ACTIONS
+// ======================
+function renderDetectedActions(actions) {
+  detectedActionsList.innerHTML = "";
+
+  const actionMap = {
+    removeMissingEmail: "Remove rows missing email",
+    removeDuplicates: "Remove duplicates",
+    splitByColumn: "Split CSV by column",
+    extractHouseNumber: "Extract house numbers",
+    fixAddress: "Fix addresses"
+  };
+
+  let found = false;
+
+  Object.keys(actions).forEach(key => {
+    if (actions[key]) {
+      found = true;
+      const li = document.createElement("li");
+      li.textContent = actionMap[key];
+      detectedActionsList.appendChild(li);
+    }
+  });
+
+  detectedActionsCard.style.display = found ? "block" : "none";
 }
 
 // ======================
@@ -94,6 +126,10 @@ runBtn.addEventListener("click", () => {
     parseCSV(e.target.result);
 
     const actions = detectActions(prompt);
+
+    // ✅ SHOW DETECTED ACTIONS
+    renderDetectedActions(actions);
+
     resultRows = [...rows];
 
     if (actions.removeMissingEmail) {
@@ -105,8 +141,8 @@ runBtn.addEventListener("click", () => {
     }
 
     resultSummary.textContent = `
-      Original rows: ${rows.length}
-      → Final rows: ${resultRows.length}
+Original rows: ${rows.length}
+→ Final rows: ${resultRows.length}
     `;
 
     resultCard.style.display = "block";
