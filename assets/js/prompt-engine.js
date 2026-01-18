@@ -1,5 +1,5 @@
 // ======================
-// PROMPT ENGINE — FINAL V6 (SPLIT BY COLUMN)
+// PROMPT ENGINE — FINAL V7 (SPLIT → MULTI DOWNLOAD)
 // ======================
 
 // DOM
@@ -30,6 +30,7 @@ const progressPercent = document.getElementById("progressPercent");
 let headers = [];
 let rows = [];
 let finalRows = [];
+let splitGroups = null;
 let actionParams = {};
 
 // ======================
@@ -39,6 +40,18 @@ function parseCSV(text) {
   const lines = text.trim().split("\n");
   headers = lines[0].split(",");
   rows = lines.slice(1).map(r => r.split(","));
+}
+
+function downloadCSV(filename, headers, rows) {
+  const csv = [headers, ...rows].map(r => r.join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 // ======================
@@ -81,42 +94,24 @@ function detectActions(prompt) {
   const p = prompt.toLowerCase();
 
   return {
-    filterRealEstate: p.includes("filter real estate"),
-    removeMissingEmail: p.includes("missing email"),
-    removeDuplicates: p.includes("duplicate"),
-    extractHouseNumbers: p.includes("house"),
-    createColumn: p.includes("new column"),
     splitByColumn: p.includes("split"),
   };
 }
 
 // ======================
-// DETECTED ACTIONS UI
+// ACTION LIST UI
 // ======================
 function renderDetectedActions(actions) {
   detectedActionsList.innerHTML = "";
 
-  const labels = {
-    filterRealEstate: "Filter real estate agents",
-    removeMissingEmail: "Remove rows missing email",
-    removeDuplicates: "Remove duplicate contacts",
-    extractHouseNumbers: "Extract house numbers",
-    createColumn: "Create a new column",
-    splitByColumn: "Split CSV by column",
-  };
-
-  let found = false;
-
-  Object.keys(actions).forEach(key => {
-    if (actions[key]) {
-      found = true;
-      const li = document.createElement("li");
-      li.textContent = labels[key];
-      detectedActionsList.appendChild(li);
-    }
-  });
-
-  detectedActionsCard.style.display = found ? "block" : "none";
+  if (actions.splitByColumn) {
+    const li = document.createElement("li");
+    li.textContent = "Split CSV by column";
+    detectedActionsList.appendChild(li);
+    detectedActionsCard.style.display = "block";
+  } else {
+    detectedActionsCard.style.display = "none";
+  }
 }
 
 // ======================
@@ -126,37 +121,33 @@ function renderActionParams(actions) {
   actionParamsFields.innerHTML = "";
   actionParams = {};
 
-  let needsParams = false;
-
-  // SPLIT BY COLUMN
-  if (actions.splitByColumn) {
-    needsParams = true;
-
-    const label = document.createElement("label");
-    label.textContent = "Select column to split by:";
-    label.style.display = "block";
-
-    const select = document.createElement("select");
-    select.style.width = "100%";
-    select.style.padding = "10px";
-
-    headers.forEach(h => {
-      const opt = document.createElement("option");
-      opt.value = h;
-      opt.textContent = h;
-      select.appendChild(opt);
-    });
-
-    select.addEventListener("change", () => {
-      actionParams.splitColumn = select.value;
-      updateRunButton();
-    });
-
-    actionParamsFields.appendChild(label);
-    actionParamsFields.appendChild(select);
+  if (!actions.splitByColumn) {
+    actionParamsCard.style.display = "none";
+    return;
   }
 
-  actionParamsCard.style.display = needsParams ? "block" : "none";
+  const label = document.createElement("label");
+  label.textContent = "Select column to split by:";
+
+  const select = document.createElement("select");
+  select.style.width = "100%";
+  select.style.padding = "10px";
+
+  headers.forEach(h => {
+    const opt = document.createElement("option");
+    opt.value = h;
+    opt.textContent = h;
+    select.appendChild(opt);
+  });
+
+  select.addEventListener("change", () => {
+    actionParams.splitColumn = select.value;
+    updateRunButton();
+  });
+
+  actionParamsFields.appendChild(label);
+  actionParamsFields.appendChild(select);
+  actionParamsCard.style.display = "block";
 }
 
 // ======================
@@ -165,12 +156,10 @@ function renderActionParams(actions) {
 function updateRunButton() {
   const hasPrompt = promptInput.value.trim();
   const hasFile = fileInput.files.length;
+  const needsColumn = detectActions(promptInput.value.trim()).splitByColumn &&
+                      !actionParams.splitColumn;
 
-  const missingSplit =
-    detectActions(promptInput.value.trim()).splitByColumn &&
-    !actionParams.splitColumn;
-
-  runBtn.disabled = !(hasPrompt && hasFile) || missingSplit;
+  runBtn.disabled = !(hasPrompt && hasFile) || needsColumn;
   runBtn.classList.toggle("enabled", !runBtn.disabled);
 }
 
@@ -190,12 +179,12 @@ fileInput.addEventListener("change", updateRunButton);
 // RUN PROMPT
 // ======================
 runBtn.addEventListener("click", () => {
-  const reader = new FileReader();
-
   statusBox.style.display = "block";
-  statusText.textContent = "Processing CSV…";
-  progressBar.style.width = "20%";
-  progressPercent.textContent = "20%";
+  statusText.textContent = "Splitting CSV…";
+  progressBar.style.width = "30%";
+  progressPercent.textContent = "30%";
+
+  const reader = new FileReader();
 
   reader.onload = e => {
     parseCSV(e.target.result);
@@ -203,30 +192,27 @@ runBtn.addEventListener("click", () => {
     previewCard.style.display = "block";
     renderCSVPreview(csvPreviewTable, headers, rows);
 
-    finalRows = [...rows];
-    const actions = detectActions(promptInput.value.trim());
+    const result = window.splitByColumn(
+      headers,
+      rows,
+      actionParams.splitColumn
+    );
 
-    // SPLIT BY COLUMN (SAFE DEFAULT OUTPUT)
-    if (actions.splitByColumn) {
-      const result = window.splitByColumn(headers, finalRows, actionParams.splitColumn);
+    splitGroups = result.groups;
 
-      // Take the largest group for now
-      const largestGroup = Object.values(result.groups)
-        .sort((a, b) => b.length - a.length)[0];
-
-      finalRows = largestGroup || [];
-    }
+    const groupCount = Object.keys(splitGroups).length;
 
     progressBar.style.width = "100%";
     progressPercent.textContent = "100%";
 
     resultSummary.textContent =
-      `Columns: ${headers.length}\n` +
-      `Original rows: ${rows.length}\n` +
-      `Final rows: ${finalRows.length}`;
+      `Split column: ${actionParams.splitColumn}\n` +
+      `Total rows: ${rows.length}\n` +
+      `Groups created: ${groupCount}`;
 
-    resultCard.style.display = "block";
     downloadBtn.disabled = false;
+    downloadBtn.textContent = "Download All Split CSVs";
+    resultCard.style.display = "block";
     statusText.textContent = "Completed";
   };
 
@@ -234,16 +220,16 @@ runBtn.addEventListener("click", () => {
 });
 
 // ======================
-// DOWNLOAD
+// DOWNLOAD (MULTI FILE)
 // ======================
 downloadBtn.addEventListener("click", () => {
-  const csv = [headers, ...finalRows].map(r => r.join(",")).join("\n");
-  const blob = new Blob([csv], { type: "text/csv" });
-  const url = URL.createObjectURL(blob);
+  if (!splitGroups) return;
 
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "processed.csv";
-  a.click();
-  URL.revokeObjectURL(url);
+  Object.keys(splitGroups).forEach(key => {
+    const safeKey = key.replace(/[^a-z0-9]/gi, "_") || "EMPTY";
+    const filename =
+      `split-${actionParams.splitColumn}-${safeKey}.csv`;
+
+    downloadCSV(filename, headers, splitGroups[key]);
+  });
 });
