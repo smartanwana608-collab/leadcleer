@@ -62,6 +62,40 @@ body {
   color: var(--violet);
 }
 
+/* ================= MOBILE MENU BUTTON ================= */
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 26px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+/* ================= MOBILE NAV ================= */
+.mobile-nav {
+  display: none;
+  flex-direction: column;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+}
+
+.mobile-nav a {
+  padding: 16px 24px;
+  text-decoration: none;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+}
+
+.mobile-nav a.active {
+  color: var(--violet);
+}
+
+/* OPEN STATE */
+.mobile-nav.open {
+  display: flex;
+}
+
 /* ================= HERO ================= */
 .hero {
   position: relative;
@@ -168,7 +202,7 @@ h2 {
   font-size: 0.95rem;
 }
 
-/* ================= PAGE HERO (FIX — FEATURES TEXT CENTERED) ================= */
+/* ================= PAGE HERO ================= */
 .page-hero {
   max-width: 900px;
   margin: 120px auto 80px;
@@ -322,6 +356,10 @@ h2 {
 
   .nav-links {
     display: none;
+  }
+
+  .menu-toggle {
+    display: block;
   }
 
   section {
