@@ -1,5 +1,5 @@
 // ======================
-// PROMPT ENGINE — STEP 2 (SMART PARAMETERS UI)
+// PROMPT ENGINE — STEP 3 (UX POLISH + FEEDBACK)
 // ======================
 
 // DOM
@@ -41,6 +41,9 @@ function parseCSV(text) {
   rows = lines.slice(1).map(r => r.split(","));
 }
 
+// ======================
+// PREVIEW
+// ======================
 function renderCSVPreview(tableEl, headers, rows, limit = 10) {
   tableEl.innerHTML = "";
 
@@ -72,7 +75,7 @@ function renderCSVPreview(tableEl, headers, rows, limit = 10) {
 }
 
 // ======================
-// ACTION DETECTOR (LOCKED SET)
+// ACTION DETECTOR (LOCKED)
 // ======================
 function detectActions(prompt) {
   const p = prompt.toLowerCase();
@@ -125,7 +128,7 @@ function renderActionParams(actions) {
   actionParamsFields.innerHTML = "";
   actionParams = {};
 
-  // CREATE COLUMN → TEXT INPUT
+  // CREATE COLUMN
   if (actions.createColumn) {
     const label = document.createElement("label");
     label.textContent = "New column name";
@@ -147,7 +150,7 @@ function renderActionParams(actions) {
     return;
   }
 
-  // COLUMN SELECTOR (shared)
+  // COLUMN SELECTOR
   if (
     actions.splitByColumn ||
     actions.extractHouseNumbers ||
@@ -187,12 +190,9 @@ function renderActionParams(actions) {
 function updateRunButton() {
   const hasPrompt = promptInput.value.trim();
   const hasFile = fileInput.files.length;
-
   const actions = detectActions(promptInput.value.trim());
 
-  const needsColumnName =
-    actions.createColumn && !actionParams.columnName;
-
+  const needsColumnName = actions.createColumn && !actionParams.columnName;
   const needsColumn =
     (actions.splitByColumn ||
       actions.extractHouseNumbers ||
@@ -216,24 +216,27 @@ promptInput.addEventListener("input", () => {
 fileInput.addEventListener("change", updateRunButton);
 
 // ======================
-// RUN PROMPT (SAFE)
+// RUN PROMPT (UX POLISHED)
 // ======================
 runBtn.addEventListener("click", () => {
   statusBox.style.display = "block";
-  statusText.textContent = "Processing CSV…";
-  progressBar.style.width = "30%";
-  progressPercent.textContent = "30%";
+  statusText.textContent = "Reading CSV…";
+  progressBar.style.width = "20%";
+  progressPercent.textContent = "20%";
 
   const reader = new FileReader();
 
   reader.onload = e => {
     parseCSV(e.target.result);
 
+    statusText.textContent = "Applying selected actions…";
+    progressBar.style.width = "50%";
+    progressPercent.textContent = "50%";
+
     renderCSVPreview(csvPreviewTable, headers, rows);
     previewCard.style.display = "block";
 
     finalRows = [...rows];
-
     const actions = detectActions(promptInput.value.trim());
 
     try {
@@ -267,11 +270,7 @@ runBtn.addEventListener("click", () => {
         finalRows = window.removeDuplicates(headers, finalRows).rows;
       }
 
-      if (actions.splitByColumn) {
-        alert("Split by column runs as a multi-download step next.");
-        return;
-      }
-
+      statusText.textContent = "Finalizing output…";
       progressBar.style.width = "100%";
       progressPercent.textContent = "100%";
 
@@ -282,9 +281,10 @@ runBtn.addEventListener("click", () => {
 
       resultCard.style.display = "block";
       downloadBtn.disabled = false;
-      statusText.textContent = "Completed";
+      downloadBtn.classList.add("enabled");
+      statusText.textContent = "Completed ✅";
     } catch (err) {
-      alert(err.message || "Action failed.");
+      alert(err.message || "Action failed on this CSV.");
     }
   };
 
