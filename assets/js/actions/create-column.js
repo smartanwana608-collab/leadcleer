@@ -1,19 +1,17 @@
 // ===================================
-// CREATE NEW COLUMN (ACTION)
+// CREATE NEW COLUMN (ACTION) — SAFE V1
 // ===================================
 
 /**
  * Create a new column with empty values
+ * (Default column name: "New Column")
  *
  * @param {Array} headers
  * @param {Array} rows
- * @param {String} columnName
  * @returns {Object}
  */
-function createNewColumn(headers, rows, columnName) {
-  if (!columnName || typeof columnName !== "string") {
-    throw new Error("Column name is required");
-  }
+function createNewColumn(headers, rows) {
+  const columnName = "New Column";
 
   // Prevent duplicate column
   if (headers.map(h => h.toLowerCase()).includes(columnName.toLowerCase())) {
@@ -25,9 +23,7 @@ function createNewColumn(headers, rows, columnName) {
 
   const newHeaders = [...headers, columnName];
 
-  const newRows = rows.map(row => {
-    return [...row, ""];
-  });
+  const newRows = rows.map(row => [...row, ""]);
 
   return {
     headers: newHeaders,
