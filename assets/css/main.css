@@ -265,3 +265,24 @@ th {
   width: 0%;
   background: #2563eb;
 }
+/* BACK TO HOME BUTTON */
+.back-home {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background: #ffffff;
+  color: #2563eb;
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  z-index: 1000;
+}
+
+.back-home:hover {
+  background: #2563eb;
+  color: #ffffff;
+}
