@@ -3,14 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Leadcleer — Turn Messy CSVs Into Clean Leads</title>
 
-  <!-- Favicon (simple text-based fallback) -->
-  <link rel="icon" href="data:image/svg+xml,
-  <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
-    <rect width='100' height='100' fill='%236b4eff'/>
-    <text x='50%' y='60%' text-anchor='middle' fill='white' font-size='60' font-family='Arial'>L</text>
-  </svg>">
+  <!-- Favicon -->
+  <link
+    rel="icon"
+    type="image/svg+xml"
+    href="data:image/svg+xml,
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
+      <rect width='100' height='100' fill='%236b4eff'/>
+      <text x='50%' y='62%' text-anchor='middle' fill='white'
+        font-size='56' font-family='Arial' font-weight='700'>L</text>
+    </svg>"
+  />
 
   <link rel="stylesheet" href="/assets/css/main.css" />
 </head>
@@ -20,7 +26,10 @@
 <!-- ================= NAV ================= -->
 <header class="nav">
   <div class="nav-container">
-    <div class="logo">Leadcleer</div>
+    <div class="logo">
+      <span class="logo-dot"></span>
+      <span>Leadcleer</span>
+    </div>
     <nav>
       <a href="#features">Features</a>
       <a href="#tools">Tools</a>
@@ -33,15 +42,21 @@
 <!-- ================= HERO ================= -->
 <section class="hero">
   <div class="hero-content">
-    <h1>Turn Messy CSVs Into <span>Clean Leads</span></h1>
+    <h1>
+      Turn Messy CSVs Into <span>Clean Leads</span>
+    </h1>
     <p>
-      Leadcleer helps you clean, filter, and organize contact data
-      with powerful browser-based tools — fast, private, and secure.
+      Leadcleer helps you clean, filter, and organize contact data using
+      fast, private, browser-based tools — no uploads required.
     </p>
 
     <div class="hero-actions">
-      <a href="#tools" class="btn primary">Get Started Free</a>
-      <a href="#tools" class="btn secondary">Open Tools</a>
+      <a href="/pages/prompt-tool.html" class="btn primary">
+        Get Started Free
+      </a>
+      <a href="#tools" class="btn secondary">
+        Open Tools
+      </a>
     </div>
   </div>
 
@@ -55,17 +70,23 @@
   <div class="feature-grid">
     <div class="feature-card">
       <h3>Clean Contact Data</h3>
-      <p>Remove duplicates, fix formatting, and standardize CSV files effortlessly.</p>
+      <p>
+        Remove duplicates, fix formatting, and standardize CSV files effortlessly.
+      </p>
     </div>
 
     <div class="feature-card">
-      <h3>Filter Smartly</h3>
-      <p>Identify real estate agents, business emails, or unwanted leads in seconds.</p>
+      <h3>Smart Filtering</h3>
+      <p>
+        Identify real estate agents, business emails, or unwanted leads in seconds.
+      </p>
     </div>
 
     <div class="feature-card">
-      <h3>Private by Design</h3>
-      <p>Your files stay in your browser. No uploads. No storage. No tracking.</p>
+      <h3>Privacy First</h3>
+      <p>
+        Your files stay in your browser. No uploads, no storage, no tracking.
+      </p>
     </div>
   </div>
 </section>
@@ -77,14 +98,22 @@
   <div class="tool-grid">
     <div class="tool-card">
       <h3>Prompt-Based CSV Tool</h3>
-      <p>Describe what you want to do — Leadcleer handles the rest.</p>
-      <a href="/pages/prompt-tool.html" class="btn primary">Open Tool</a>
+      <p>
+        Describe what you want to do — Leadcleer handles the rest.
+      </p>
+      <a href="/pages/prompt-tool.html" class="btn primary">
+        Open Tool
+      </a>
     </div>
 
     <div class="tool-card">
       <h3>Filter Real Estate Agents</h3>
-      <p>Detect and separate real estate contacts automatically.</p>
-      <a href="/pages/filter-real-estate.html" class="btn secondary">Open Tool</a>
+      <p>
+        Automatically detect and separate real estate contacts.
+      </p>
+      <a href="/pages/filter-real-estate.html" class="btn secondary">
+        Open Tool
+      </a>
     </div>
   </div>
 </section>
@@ -100,7 +129,7 @@
     </div>
     <div class="step">
       <span>2</span>
-      <p>Choose or describe an action</p>
+      <p>Select or describe an action</p>
     </div>
     <div class="step">
       <span>3</span>
@@ -112,39 +141,56 @@
 <!-- ================= DISCLAIMER ================= -->
 <section class="disclaimer">
   <p>
-    <strong>Disclaimer:</strong> Leadcleer processes data locally in your browser.
-    We do not store, collect, or transmit uploaded files.
-    You are responsible for ensuring compliance with applicable data laws.
+    <strong>Disclaimer:</strong>
+    Leadcleer processes CSV files locally in your browser.
+    We do not store, collect, or transmit uploaded data.
+    You are responsible for compliance with applicable data protection laws.
   </p>
 </section>
 
 <!-- ================= FOOTER ================= -->
 <footer class="footer" id="contact">
-  <div class="footer-content">
-    <div>
-      <h3>Leadcleer</h3>
-      <p>Turn messy CSVs into clean leads.</p>
-    </div>
+  <div class="footer-container">
 
-    <div>
-      <h4>Contact</h4>
-      <p>
-        <a href="mailto:smartanwana608@gmail.com">
-          smartanwana608@gmail.com
-        </a>
+    <!-- Brand -->
+    <div class="footer-brand">
+      <div class="footer-logo">
+        <span class="logo-dot"></span>
+        <span class="logo-text">Leadcleer</span>
+      </div>
+      <p class="footer-tagline">
+        Turn messy CSVs into clean, usable leads — fast.
       </p>
     </div>
 
-    <div>
-      <h4>Legal</h4>
-      <a href="#">Privacy Policy</a>
-      <a href="#">Terms & Conditions</a>
+    <!-- Links -->
+    <div class="footer-links">
+      <div class="footer-column">
+        <h4>Product</h4>
+        <a href="/pages/prompt-tool.html">Get Started Free</a>
+        <a href="/pages/filter-real-estate.html">Tools</a>
+        <a href="#how">How It Works</a>
+      </div>
+
+      <div class="footer-column">
+        <h4>Legal</h4>
+        <a href="/pages/privacy.html">Privacy Policy</a>
+        <a href="/pages/terms.html">Terms & Conditions</a>
+      </div>
+
+      <div class="footer-column">
+        <h4>Contact</h4>
+        <a href="mailto:smartanwana608@gmail.com">
+          smartanwana608@gmail.com
+        </a>
+      </div>
     </div>
+
   </div>
 
-  <p class="copyright">
+  <div class="footer-bottom">
     © 2026 Leadcleer. All rights reserved.
-  </p>
+  </div>
 </footer>
 
 </body>
