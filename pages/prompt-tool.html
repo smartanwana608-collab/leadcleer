@@ -4,20 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Prompt-Based CSV Tool | CSV Contact Tools</title>
-
-  <meta
-    name="description"
-    content="Describe what you want to do with your CSV file and let the system process it."
-  />
-
-  <link rel="stylesheet" href="../assets/css/main.css" />
+  <title>Prompt-Based CSV Tool</title>
+  <link rel="stylesheet" href="/assets/css/main.css" />
 </head>
 
 <body>
 
 <header class="tool-header">
-  <a href="../index.html" class="back-home">← Home</a>
+  <a href="/index.html" class="back-home">← Home</a>
   <h1>Prompt-Based CSV Tool</h1>
   <p>Describe what you want to do with your CSV file.</p>
 </header>
@@ -27,45 +21,41 @@
   <!-- PROMPT -->
   <div class="card">
     <h2>What do you want to do?</h2>
-
     <textarea
       id="promptInput"
       rows="4"
       placeholder="Example: filter real estate agents"
-      style="width:100%; padding:14px; border-radius:10px; border:1px solid #e5e7eb;"
+      style="width:100%; padding:14px;"
     ></textarea>
   </div>
 
   <!-- FILE -->
   <div class="card">
     <h2>Upload CSV</h2>
-    <div class="upload-box">
-      <input type="file" id="csvFile" accept=".csv" />
-    </div>
+    <input type="file" id="csvFile" accept=".csv" />
   </div>
 
   <!-- RUN -->
   <div class="card">
-    <button id="runBtn" class="btn" disabled>Run Prompt</button>
-
-    <div id="statusBox" style="display:none; margin-top:12px;">
+    <button id="runBtn" disabled>Run Prompt</button>
+    <div id="statusBox" style="display:none;">
       <strong>Status:</strong> <span id="statusText"></span>
     </div>
   </div>
 
-  <!-- RESULTS -->
+  <!-- RESULT -->
   <div class="card" id="resultCard" style="display:none;">
     <h2>Results</h2>
-    <p id="resultSummary"></p>
+    <pre id="resultSummary"></pre>
   </div>
 
 </main>
 
-<!-- ACTION (ONLY ONE FOR TESTING) -->
-<script src="../assets/js/actions/filter-real-estate.js"></script>
+<!-- ACTIONS (ABSOLUTE PATHS) -->
+<script src="/actions/filter-real-estate.js"></script>
 
-<!-- PROMPT ENGINE -->
-<script src="../assets/js/prompt-engine.js"></script>
+<!-- ENGINE -->
+<script src="/assets/js/prompt-engine.js"></script>
 
 </body>
 </html>
