@@ -1,7 +1,7 @@
 // ======================
-// CONFIG
+// KEYWORDS (Editable)
 // ======================
-const AGENT_KEYWORDS = [
+let keywords = [
   "realtor",
   "realty",
   "broker",
@@ -20,7 +20,7 @@ const AGENT_KEYWORDS = [
 function isAgentEmail(email) {
   if (!email) return false;
   const lower = email.toLowerCase();
-  return AGENT_KEYWORDS.some(keyword => lower.includes(keyword));
+  return keywords.some(keyword => lower.includes(keyword));
 }
 
 function isRealEstateAgent(row, emailIndexes) {
@@ -31,9 +31,7 @@ function isRealEstateAgent(row, emailIndexes) {
 }
 
 function downloadCSV(filename, headers, rows) {
-  const csvContent =
-    [headers, ...rows].map(r => r.join(",")).join("\n");
-
+  const csvContent = [headers, ...rows].map(r => r.join(",")).join("\n");
   const blob = new Blob([csvContent], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
 
@@ -63,10 +61,55 @@ document.addEventListener("DOMContentLoaded", () => {
   const downloadAgentsBtn = document.getElementById("downloadAgents");
   const downloadOthersBtn = document.getElementById("downloadOthers");
 
+  // Keyword UI elements
+  const keywordListEl = document.getElementById("keywordList");
+  const newKeywordInput = document.getElementById("newKeyword");
+  const addKeywordBtn = document.getElementById("addKeywordBtn");
+
   let headers = [];
   let parsedRows = [];
   let agents = [];
   let nonAgents = [];
+
+  // ======================
+  // KEYWORD UI
+  // ======================
+  function renderKeywords() {
+    if (!keywordListEl) return;
+
+    keywordListEl.innerHTML = "";
+    keywords.forEach((kw, index) => {
+      const tag = document.createElement("div");
+      tag.className = "keyword";
+      tag.innerHTML = `
+        ${kw}
+        <button type="button" data-index="${index}">×</button>
+      `;
+      keywordListEl.appendChild(tag);
+    });
+
+    // Remove keyword handler
+    keywordListEl.querySelectorAll("button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const index = parseInt(btn.dataset.index);
+        keywords.splice(index, 1);
+        renderKeywords();
+      });
+    });
+  }
+
+  if (addKeywordBtn) {
+    addKeywordBtn.addEventListener("click", () => {
+      const value = newKeywordInput.value.trim().toLowerCase();
+      if (!value || keywords.includes(value)) return;
+
+      keywords.push(value);
+      newKeywordInput.value = "";
+      renderKeywords();
+    });
+  }
+
+  renderKeywords();
 
   // ======================
   // FILE UPLOAD
@@ -75,7 +118,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!fileInput.files.length) return;
 
     const file = fileInput.files[0];
-
     fileNameEl.textContent = `File name: ${file.name}`;
 
     analyzeBtn.classList.add("enabled");
@@ -100,10 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     reader.onload = e => {
       const text = e.target.result;
-      const rows = text
-        .trim()
-        .split("\n")
-        .map(r => r.split(","));
+      const rows = text.trim().split("\n").map(r => r.split(","));
 
       headers = rows[0];
       parsedRows = rows.slice(1);
@@ -131,7 +170,6 @@ document.addEventListener("DOMContentLoaded", () => {
       agentCountEl.textContent = agents.length;
       otherCountEl.textContent = nonAgents.length;
 
-      // Enable downloads
       downloadAgentsBtn.classList.add("enabled");
       downloadAgentsBtn.disabled = false;
 
