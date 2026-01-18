@@ -1,72 +1,88 @@
-// ======================
-// PROMPT ENGINE — BASELINE TEST (SAFE)
-// ======================
+// ===============================
+// PROMPT ENGINE — SAFE MINIMAL
+// ===============================
 
-console.log("✅ Prompt Engine Loaded");
-
-// DOM
 const promptInput = document.getElementById("promptInput");
 const fileInput = document.getElementById("csvFile");
 const runBtn = document.getElementById("runBtn");
 
 const statusBox = document.getElementById("statusBox");
 const statusText = document.getElementById("statusText");
-
 const resultCard = document.getElementById("resultCard");
 const resultSummary = document.getElementById("resultSummary");
 
-// Enable button safely
-function updateRunButton() {
-  runBtn.disabled = !(
-    promptInput.value.trim().length > 0 &&
-    fileInput.files.length > 0
-  );
-  runBtn.classList.toggle("enabled", !runBtn.disabled);
-}
+let headers = [];
+let rows = [];
 
-promptInput.addEventListener("input", updateRunButton);
-fileInput.addEventListener("change", updateRunButton);
-
-// CSV Parser (simple & safe)
+// -------------------------------
+// CSV PARSER (simple + safe)
+// -------------------------------
 function parseCSV(text) {
   const lines = text.trim().split("\n");
-  const headers = lines[0].split(",").map(h => h.trim());
-  const rows = lines.slice(1).map(r => r.split(","));
-  return { headers, rows };
+  headers = lines[0].split(",").map(h => h.trim());
+  rows = lines.slice(1).map(r => r.split(","));
 }
 
-// RUN PROMPT
-runBtn.addEventListener("click", () => {
-  statusBox.style.display = "block";
-  statusText.textContent = "Processing…";
+// -------------------------------
+// ENABLE RUN BUTTON
+// -------------------------------
+function updateRunBtn() {
+  runBtn.disabled = !(
+    promptInput.value.trim() &&
+    fileInput.files.length
+  );
+}
 
-  const promptText = promptInput.value.toLowerCase();
+promptInput.addEventListener("input", updateRunBtn);
+fileInput.addEventListener("change", updateRunBtn);
+
+// -------------------------------
+// RUN PROMPT
+// -------------------------------
+runBtn.addEventListener("click", () => {
+  const prompt = promptInput.value.toLowerCase();
+  const file = fileInput.files[0];
+  if (!file) return;
+
+  statusBox.style.display = "block";
+  statusText.textContent = "Reading CSV...";
 
   const reader = new FileReader();
+
   reader.onload = e => {
-    const { headers, rows } = parseCSV(e.target.result);
+    try {
+      parseCSV(e.target.result);
 
-    // 🔍 ACTION DETECTION (SAFE)
-    if (promptText.includes("real estate")) {
-      if (typeof window.filterRealEstateAgents !== "function") {
-        alert("❌ filterRealEstateAgents is not loaded");
-        return;
+      let finalHeaders = headers;
+      let finalRows = rows;
+
+      // ✅ FILTER REAL ESTATE
+      if (prompt.includes("real estate")) {
+        if (typeof window.filterRealEstateAgents !== "function") {
+          throw new Error("filterRealEstateAgents is not loaded");
+        }
+
+        const result = window.filterRealEstateAgents(
+          finalHeaders,
+          finalRows
+        );
+
+        finalHeaders = result.headers;
+        finalRows = result.rows;
+
+        resultSummary.textContent =
+          `Filtered real estate agents\n` +
+          `Rows returned: ${finalRows.length}`;
       }
-
-      const result = window.filterRealEstateAgents(headers, rows);
-
-      resultSummary.textContent =
-        "Rows before: " + rows.length + "\n" +
-        "Rows after: " + result.rows.length;
 
       resultCard.style.display = "block";
       statusText.textContent = "Completed";
-      return;
-    }
 
-    alert("No supported action detected.");
-    statusText.textContent = "Idle";
+    } catch (err) {
+      console.error(err);
+      statusText.textContent = "Error — check console";
+    }
   };
 
-  reader.readAsText(fileInput.files[0]);
+  reader.readAsText(file);
 });
