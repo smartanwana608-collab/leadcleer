@@ -1,5 +1,5 @@
 // ======================
-// PROMPT ENGINE — CLEAN V2 (STABLE)
+// PROMPT ENGINE — CLEAN V3 (STABLE + SAFE)
 // ======================
 
 // ----------------------
@@ -51,7 +51,7 @@ function downloadCSV(filename, headers, rows) {
 }
 
 // ======================
-// PREVIEW
+// CSV PREVIEW
 // ======================
 function renderCSVPreview(tableEl, headers, rows, limit = 10) {
   tableEl.innerHTML = "";
@@ -84,34 +84,39 @@ function renderCSVPreview(tableEl, headers, rows, limit = 10) {
 }
 
 // ======================
-// PROMPT DETECTOR
+// PROMPT DETECTION
 // ======================
 function detectActions(prompt) {
   const p = prompt.toLowerCase();
 
   return {
+    // SAFE (NO PARAMS)
     filterRealEstate: p.includes("filter real estate"),
     removeMissingEmail: p.includes("missing email"),
     removeDuplicates: p.includes("duplicate"),
-    extractHouseNumbers:
-      p.includes("extract house numbers") && !p.includes("from "),
-    createNewColumn:
-      p.includes("create a new column") && !p.match(/column\s+\w+/),
+
+    // PARAMETER REQUIRED (BLOCKED FOR NOW)
+    extractHouseNumbers: p.includes("extract house"),
+    createNewColumn: p.includes("create a new column"),
+    splitByColumn: p.includes("split"),
+    fixAddresses: p.includes("fix address")
   };
 }
 
 // ======================
-// ACTION LIST UI
+// ACTION UI
 // ======================
 function renderDetectedActions(actions) {
   detectedActionsList.innerHTML = "";
 
-  const map = {
+  const labels = {
     filterRealEstate: "Filter real estate agents",
     removeMissingEmail: "Remove rows missing email",
     removeDuplicates: "Remove duplicate contacts",
-    extractHouseNumbers: "Extract house numbers",
-    createNewColumn: "Create a new column",
+    extractHouseNumbers: "Extract house numbers (needs parameter)",
+    createNewColumn: "Create a new column (needs parameter)",
+    splitByColumn: "Split CSV by column (needs parameter)",
+    fixAddresses: "Fix addresses (needs parameter)"
   };
 
   let found = false;
@@ -120,7 +125,7 @@ function renderDetectedActions(actions) {
     if (actions[key]) {
       found = true;
       const li = document.createElement("li");
-      li.textContent = map[key];
+      li.textContent = labels[key];
       detectedActionsList.appendChild(li);
     }
   });
@@ -129,59 +134,53 @@ function renderDetectedActions(actions) {
 }
 
 // ======================
-// PARAMETER VALIDATION ✅
-// ======================
-function validateActionParameters(actions) {
-  const errors = [];
-
-  if (actions.extractHouseNumbers) {
-    errors.push(
-      '❌ "Extract house numbers" needs a column.\nExample: Extract house numbers from Address'
-    );
-  }
-
-  if (actions.createNewColumn) {
-    errors.push(
-      '❌ "Create a new column" needs a name.\nExample: Create a new column Status'
-    );
-  }
-
-  return errors;
-}
-
-// ======================
-// ENABLE RUN BUTTON
+// RUN BUTTON ENABLE
 // ======================
 function updateRunButton() {
   runBtn.disabled = !(promptInput.value.trim() && fileInput.files.length);
-  runBtn.classList.toggle("enabled", !runBtn.disabled);
 }
 
 promptInput.addEventListener("input", () => {
-  const actions = detectActions(promptInput.value.trim());
-  renderDetectedActions(actions);
+  renderDetectedActions(detectActions(promptInput.value.trim()));
   updateRunButton();
 });
 
 fileInput.addEventListener("change", updateRunButton);
 
 // ======================
-// RUN PROMPT
+// RUN PROMPT (SAFE MODE)
 // ======================
 runBtn.addEventListener("click", () => {
   const prompt = promptInput.value.trim();
   const file = fileInput.files[0];
 
-  if (!prompt || !file) {
-    alert("Please enter a prompt and upload a CSV file.");
+  if (!prompt) {
+    alert("Please write a prompt first.");
+    return;
+  }
+
+  if (!file) {
+    alert("Please upload a CSV file.");
     return;
   }
 
   const actions = detectActions(prompt);
-  const paramErrors = validateActionParameters(actions);
 
-  if (paramErrors.length) {
-    alert(paramErrors.join("\n\n"));
+  if (!Object.values(actions).some(Boolean)) {
+    alert("No valid action detected. Use the suggested wording.");
+    return;
+  }
+
+  // BLOCK PARAMETER ACTIONS
+  if (
+    actions.extractHouseNumbers ||
+    actions.createNewColumn ||
+    actions.splitByColumn ||
+    actions.fixAddresses
+  ) {
+    alert(
+      "One or more selected actions require parameters.\n\nParameter UI is coming next."
+    );
     return;
   }
 
@@ -193,8 +192,8 @@ runBtn.addEventListener("click", () => {
     try {
       parseCSV(e.target.result);
 
-      previewCard.style.display = "block";
       renderCSVPreview(csvPreviewTable, headers, rows);
+      previewCard.style.display = "block";
 
       finalRows = [...rows];
       statusText.textContent = "Applying selected actions…";
@@ -215,15 +214,14 @@ runBtn.addEventListener("click", () => {
       }
 
       resultSummary.textContent =
-        `Rows before: ${rows.length}\nRows after: ${finalRows.length}\nColumns: ${headers.length}`;
+        `Rows before: ${rows.length}\n` +
+        `Rows after: ${finalRows.length}\n` +
+        `Columns: ${headers.length}`;
 
       resultCard.style.display = "block";
       statusText.textContent = "Completed";
     } catch (err) {
-      alert(
-        "An error occurred while applying actions.\n\n" +
-          err.message
-      );
+      alert(err.message);
       statusBox.style.display = "none";
     }
   };
