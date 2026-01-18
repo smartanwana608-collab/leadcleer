@@ -1,200 +1,89 @@
-// ======================
-// PROMPT ENGINE — V1
-// ======================
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-// DOM
-const promptInput = document.getElementById("promptInput");
-const fileInput = document.getElementById("csvFile");
-const runBtn = document.getElementById("runBtn");
+  <title>Prompt-Based CSV Tool | CSV Contact Tools</title>
 
-const statusBox = document.getElementById("statusBox");
-const statusText = document.getElementById("statusText");
+  <meta
+    name="description"
+    content="Describe what you want to do with your CSV file and let the system process it."
+  />
 
-const resultCard = document.getElementById("resultCard");
-const resultSummary = document.getElementById("resultSummary");
-const downloadBtn = document.getElementById("downloadResult");
+  <link rel="stylesheet" href="../assets/css/main.css" />
+</head>
 
-const detectedActionsCard = document.getElementById("detectedActionsCard");
-const detectedActionsList = document.getElementById("detectedActionsList");
+<body>
 
-// Preview
-const previewCard = document.getElementById("previewCard");
-const csvPreviewTable = document.getElementById("csvPreviewTable");
+<header class="tool-header">
+  <a href="../index.html" class="back-home">← Home</a>
+  <h1>Prompt-Based CSV Tool</h1>
+  <p>Describe what you want to do with your CSV file.</p>
+</header>
 
-// Data
-let headers = [];
-let rows = [];
-let finalRows = [];
+<main class="tool-container">
 
-// ======================
-// CSV HELPERS
-// ======================
-function parseCSV(text) {
-  const lines = text.trim().split("\n");
-  headers = lines[0].split(",");
-  rows = lines.slice(1).map(r => r.split(","));
-}
+  <!-- PROMPT -->
+  <div class="card">
+    <h2>What do you want to do?</h2>
 
-function downloadCSV(filename, headers, rows) {
-  const csv = [headers, ...rows].map(r => r.join(",")).join("\n");
-  const blob = new Blob([csv], { type: "text/csv" });
-  const url = URL.createObjectURL(blob);
+    <textarea
+      id="promptInput"
+      rows="4"
+      placeholder="Example: Remove rows missing email and remove duplicates"
+      style="width:100%; padding:14px; border-radius:10px; border:1px solid #e5e7eb;"
+    ></textarea>
+  </div>
 
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
-}
+  <!-- DETECTED ACTIONS -->
+  <div class="card" id="detectedActionsCard" style="display:none;">
+    <h2>Detected Actions</h2>
+    <ul id="detectedActionsList"></ul>
+  </div>
 
-// ======================
-// PREVIEW
-// ======================
-function renderCSVPreview(tableEl, headers, rows, limit = 10) {
-  tableEl.innerHTML = "";
+  <!-- FILE -->
+  <div class="card">
+    <h2>Upload CSV</h2>
+    <div class="upload-box">
+      <input type="file" id="csvFile" accept=".csv" />
+    </div>
+  </div>
 
-  const thead = document.createElement("thead");
-  const tr = document.createElement("tr");
+  <!-- RUN -->
+  <div class="card">
+    <button id="runBtn" class="btn enabled">Run Prompt</button>
+    <div id="statusBox" style="display:none; margin-top:12px;">
+      <strong>Status:</strong> <span id="statusText"></span>
+    </div>
+  </div>
 
-  headers.forEach(h => {
-    const th = document.createElement("th");
-    th.textContent = h;
-    tr.appendChild(th);
-  });
+  <!-- PREVIEW -->
+  <div class="card" id="previewCard" style="display:none;">
+    <h2>CSV Preview</h2>
+    <div class="table-wrap">
+      <table id="csvPreviewTable"></table>
+    </div>
+  </div>
 
-  thead.appendChild(tr);
-  tableEl.appendChild(thead);
+  <!-- RESULTS -->
+  <div class="card" id="resultCard" style="display:none;">
+    <h2>Results</h2>
+    <p id="resultSummary" style="white-space:pre-line;"></p>
+    <button id="downloadResult" class="download-btn enabled">
+      Download Processed CSV
+    </button>
+  </div>
 
-  const tbody = document.createElement("tbody");
+</main>
 
-  rows.slice(0, limit).forEach(row => {
-    const tr = document.createElement("tr");
-    row.forEach(cell => {
-      const td = document.createElement("td");
-      td.textContent = cell;
-      tr.appendChild(td);
-    });
-    tbody.appendChild(tr);
-  });
+<!-- JS -->
+<script src="../actions/filter-real-estate.js"></script>
+<script src="../actions/remove-missing-email.js"></script>
+<script src="../actions/remove-duplicates.js"></script>
+<script src="../actions/extract-house-numbers.js"></script>
 
-  tableEl.appendChild(tbody);
-}
+<script src="../assets/js/prompt-tool.js"></script>
 
-// ======================
-// PROMPT DETECTOR
-// ======================
-function detectActions(prompt) {
-  const p = prompt.toLowerCase();
-
-  return {
-    filterRealEstate: p.includes("real estate"),
-    removeMissingEmail: p.includes("missing email"),
-    removeDuplicates: p.includes("duplicate"),
-    extractHouseNumbers: p.includes("house"),
-  };
-}
-
-// ======================
-// DETECTED ACTIONS UI
-// ======================
-function renderDetectedActions(actions) {
-  detectedActionsList.innerHTML = "";
-
-  const map = {
-    filterRealEstate: "Filter real estate agents",
-    removeMissingEmail: "Remove rows missing email",
-    removeDuplicates: "Remove duplicates",
-    extractHouseNumbers: "Extract house numbers",
-  };
-
-  let found = false;
-
-  Object.keys(actions).forEach(key => {
-    if (actions[key]) {
-      found = true;
-      const li = document.createElement("li");
-      li.textContent = map[key];
-      detectedActionsList.appendChild(li);
-    }
-  });
-
-  detectedActionsCard.style.display = found ? "block" : "none";
-}
-
-// Live prompt feedback
-promptInput.addEventListener("input", () => {
-  const prompt = promptInput.value.trim();
-  if (!prompt) {
-    detectedActionsCard.style.display = "none";
-    return;
-  }
-  renderDetectedActions(detectActions(prompt));
-});
-
-// ======================
-// RUN PROMPT
-// ======================
-runBtn.addEventListener("click", () => {
-  const prompt = promptInput.value.trim();
-  const file = fileInput.files[0];
-
-  if (!prompt || !file) {
-    alert("Please enter a prompt and upload a CSV file.");
-    return;
-  }
-
-  statusBox.style.display = "block";
-  statusText.textContent = "Reading CSV…";
-
-  const reader = new FileReader();
-  reader.onload = e => {
-    parseCSV(e.target.result);
-
-    previewCard.style.display = "block";
-    renderCSVPreview(csvPreviewTable, headers, rows);
-
-    const actions = detectActions(prompt);
-    renderDetectedActions(actions);
-
-    finalRows = [...rows];
-
-    // ======================
-    // APPLY ACTIONS (ORDERED)
-    // ======================
-
-    if (actions.filterRealEstate) {
-      const result = window.filterRealEstateAgents(headers, finalRows);
-      finalRows = result.agents; // default output
-    }
-
-    if (actions.removeMissingEmail) {
-      const result = window.removeMissingEmail(headers, finalRows);
-      finalRows = result.withEmail;
-    }
-
-    if (actions.removeDuplicates) {
-      finalRows = window.removeDuplicates(finalRows);
-    }
-
-    if (actions.extractHouseNumbers) {
-      finalRows = window.extractHouseNumbers(headers, finalRows).rows;
-    }
-
-    resultSummary.textContent =
-      `Original rows: ${rows.length}\n→ Final rows: ${finalRows.length}`;
-
-    resultCard.style.display = "block";
-    statusText.textContent = "Completed";
-  };
-
-  reader.readAsText(file);
-});
-
-// ======================
-// DOWNLOAD
-// ======================
-downloadBtn.addEventListener("click", () => {
-  if (finalRows.length) {
-    downloadCSV("processed.csv", headers, finalRows);
-  }
-});
+</body>
+</html>
