@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pricing | Leadcleer</title>
 
-  <!-- Favicon -->
   <link rel="icon" href="/assets/favicon.svg" />
-
   <link rel="stylesheet" href="/assets/css/main.css" />
 </head>
 
@@ -17,6 +15,9 @@
 <header class="nav">
   <div class="nav-container">
     <a href="/index.html" class="logo">Leadcleer</a>
+
+    <!-- MOBILE MENU BUTTON -->
+    <button class="menu-toggle" aria-label="Toggle menu">☰</button>
 
     <nav class="nav-links">
       <a href="/index.html">Home</a>
@@ -133,6 +134,16 @@
     © 2026 Leadcleer. All rights reserved.
   </div>
 </footer>
+
+<!-- ================= MOBILE MENU SCRIPT ================= -->
+<script>
+  const toggle = document.querySelector('.menu-toggle');
+  const navLinks = document.querySelector('.nav-links');
+
+  toggle.addEventListener('click', () => {
+    navLinks.classList.toggle('open');
+  });
+</script>
 
 </body>
 </html>
