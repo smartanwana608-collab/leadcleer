@@ -102,7 +102,7 @@ function renderDetectedActions(actions) {
   const map = {
     filterRealEstate: "Filter real estate agents",
     removeMissingEmail: "Remove rows missing email",
-    removeDuplicates: "Remove duplicates",
+    removeDuplicates: "Remove duplicate contacts",
     extractHouseNumbers: "Extract house numbers",
   };
 
@@ -120,15 +120,20 @@ function renderDetectedActions(actions) {
   detectedActionsCard.style.display = found ? "block" : "none";
 }
 
-// Live prompt feedback
+// ======================
+// ENABLE RUN BUTTON LOGIC
+// ======================
+function updateRunButton() {
+  runBtn.disabled = !(promptInput.value.trim() && fileInput.files.length);
+  runBtn.classList.toggle("enabled", !runBtn.disabled);
+}
+
 promptInput.addEventListener("input", () => {
-  const prompt = promptInput.value.trim();
-  if (!prompt) {
-    detectedActionsCard.style.display = "none";
-    return;
-  }
-  renderDetectedActions(detectActions(prompt));
+  renderDetectedActions(detectActions(promptInput.value.trim()));
+  updateRunButton();
 });
+
+fileInput.addEventListener("change", updateRunButton);
 
 // ======================
 // RUN PROMPT
@@ -137,10 +142,7 @@ runBtn.addEventListener("click", () => {
   const prompt = promptInput.value.trim();
   const file = fileInput.files[0];
 
-  if (!prompt || !file) {
-    alert("Enter a prompt and upload a CSV file.");
-    return;
-  }
+  if (!prompt || !file) return;
 
   statusBox.style.display = "block";
   statusText.textContent = "Reading CSV…";
@@ -153,19 +155,14 @@ runBtn.addEventListener("click", () => {
     renderCSVPreview(csvPreviewTable, headers, rows);
 
     const actions = detectActions(prompt);
-    renderDetectedActions(actions);
-
     finalRows = [...rows];
 
-    // APPLY ACTIONS (ORDER MATTERS)
     if (actions.filterRealEstate) {
-      const result = window.filterRealEstateAgents(headers, finalRows);
-      finalRows = result.agents;
+      finalRows = window.filterRealEstateAgents(headers, finalRows).agents;
     }
 
     if (actions.removeMissingEmail) {
-      const result = window.removeMissingEmail(headers, finalRows);
-      finalRows = result.withEmail;
+      finalRows = window.removeMissingEmail(headers, finalRows).withEmail;
     }
 
     if (actions.removeDuplicates) {
