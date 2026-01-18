@@ -61,9 +61,7 @@
   <!-- ================= ACTION PARAMETERS ================= -->
   <div class="card" id="actionParamsCard" style="display:none;">
     <h2>Action Parameters</h2>
-
     <div id="actionParamsFields"></div>
-
     <p style="font-size:0.9rem; color:#6b7280; margin-top:10px;">
       These actions require additional information before running.
       Column lists are detected automatically from your CSV.
@@ -85,7 +83,6 @@
     <div id="statusBox" style="display:none; margin-top:12px;">
       <strong>Status:</strong> <span id="statusText"></span>
 
-      <!-- Progress -->
       <div style="margin-top:10px;">
         <div style="background:#e5e7eb; border-radius:8px; overflow:hidden;">
           <div
@@ -109,9 +106,7 @@
   <!-- ================= RESULTS ================= -->
   <div class="card" id="resultCard" style="display:none;">
     <h2>Results</h2>
-
     <p id="resultSummary" style="white-space:pre-line;"></p>
-
     <button id="downloadResult" class="download-btn" disabled>
       Download Processed CSV
     </button>
@@ -119,14 +114,14 @@
 
 </main>
 
-<!-- ================= ACTION SCRIPTS ================= -->
-<script src="../actions/create-column.js"></script>
-<script src="../actions/extract-house-numbers.js"></script>
-<script src="../actions/fix-addresses.js"></script>
-<script src="../actions/filter-real-estate.js"></script>
-<script src="../actions/remove-missing-email.js"></script>
-<script src="../actions/remove-duplicates.js"></script>
-<script src="../actions/split-by-column.js"></script>
+<!-- ================= ACTION SCRIPTS (✅ FIXED PATHS) ================= -->
+<script src="../assets/js/actions/create-column.js"></script>
+<script src="../assets/js/actions/extract-house-numbers.js"></script>
+<script src="../assets/js/actions/fix-addresses.js"></script>
+<script src="../assets/js/actions/filter-real-estate.js"></script>
+<script src="../assets/js/actions/remove-missing-email.js"></script>
+<script src="../assets/js/actions/remove-duplicates.js"></script>
+<script src="../assets/js/actions/split-by-column.js"></script>
 
 <!-- ================= PROMPT ENGINE ================= -->
 <script src="../assets/js/prompt-engine.js"></script>
