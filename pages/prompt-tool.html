@@ -31,9 +31,24 @@
     <textarea
       id="promptInput"
       rows="4"
-      placeholder="Example: Remove rows missing email and remove duplicates"
+      placeholder="Example: Remove rows missing email and remove duplicate contacts"
       style="width:100%; padding:14px; border-radius:10px; border:1px solid #e5e7eb;"
     ></textarea>
+
+    <!-- SUPPORTED ACTIONS -->
+    <div style="margin-top:14px;">
+      <strong>You can ask me to:</strong>
+      <ul style="margin-top:8px; padding-left:18px; line-height:1.8;">
+        <li>Filter real estate agents</li>
+        <li>Remove rows missing email</li>
+        <li>Remove duplicate contacts</li>
+        <li>Extract house numbers</li>
+        <li>Create a new column</li>
+      </ul>
+      <p style="margin-top:8px; font-size:0.9rem; color:#6b7280;">
+        Tip: Use the same wording in your prompt for best results.
+      </p>
+    </div>
   </div>
 
   <!-- DETECTED ACTIONS -->
@@ -77,12 +92,14 @@
 
 </main>
 
-<!-- JS -->
+<!-- ACTIONS -->
 <script src="../actions/filter-real-estate.js"></script>
 <script src="../actions/remove-missing-email.js"></script>
 <script src="../actions/remove-duplicates.js"></script>
 <script src="../actions/extract-house-numbers.js"></script>
+<script src="../actions/create-column.js"></script>
 
+<!-- PROMPT ENGINE -->
 <script src="../assets/js/prompt-tool.js"></script>
 
 </body>
