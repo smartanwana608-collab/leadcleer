@@ -775,3 +775,217 @@ input[type="file"] {
     padding: 24px;
   }
 }
+/* =====================================================
+FILTER REAL ESTATE TOOL – FINAL OVERRIDE
+PAGE-SCOPED, NON-BREAKING
+===================================================== */
+
+/* Disable marketing spacing for tool page */
+.tool-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 60px 24px 120px;
+}
+
+/* Remove global section padding interference */
+.tool-container section {
+  padding: 0 !important;
+  margin-bottom: 28px;
+}
+
+/* ================= HEADER ================= */
+.tool-header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.tool-header h1 {
+  font-size: 2.4rem;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.tool-subtitle {
+  color: var(--muted);
+  font-size: 1rem;
+}
+
+/* ================= TOOL CARDS ================= */
+.tool-card {
+  background: linear-gradient(180deg, #0f1430, #090c1a);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 22px;
+  padding: 32px;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.45);
+}
+
+/* ================= UPLOAD ================= */
+.upload-card {
+  display: flex;
+  justify-content: center;
+}
+
+.upload-box {
+  border: 1px dashed var(--border);
+  border-radius: 16px;
+  padding: 36px;
+  width: 100%;
+  max-width: 520px;
+  text-align: center;
+  background: #0c1022;
+}
+
+.upload-box input[type="file"] {
+  margin-bottom: 10px;
+}
+
+.upload-hint {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+/* ================= META PILLS ================= */
+.meta-card {
+  display: flex;
+  justify-content: center;
+}
+
+.meta-pills {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.meta-pill {
+  background: #ffffff;
+  color: #0b0d12;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* ================= KEYWORDS ================= */
+.keywords-card {
+  text-align: center;
+}
+
+.keywords-info {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-bottom: 18px;
+}
+
+.keyword-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.keyword-chip {
+  background: rgba(255,255,255,0.12);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+}
+
+.keyword-add {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.keyword-add input {
+  max-width: 260px;
+}
+
+/* ================= ANALYZE ================= */
+.analyze-card {
+  text-align: center;
+}
+
+.analyze-card .btn.primary {
+  font-size: 1rem;
+  padding: 16px 36px;
+}
+
+.analyze-summary {
+  margin-top: 22px;
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+/* ================= RESULTS ================= */
+.results-card {
+  margin-top: 20px;
+}
+
+.results-title {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.results-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 36px;
+}
+
+/* ================= RESULT CARD ================= */
+.result-card {
+  background: linear-gradient(180deg, #0f1430, #090c1a);
+  border-radius: 20px;
+  padding: 28px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+/* ================= TABLE ================= */
+.table-wrap {
+  max-height: 300px;
+  overflow: auto;
+  border-radius: 12px;
+  background: #0c1022;
+}
+
+.preview-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.preview-table th {
+  background: #0b0f22;
+  position: sticky;
+  top: 0;
+  padding: 10px;
+  text-align: left;
+  color: var(--muted);
+}
+
+.preview-table td {
+  padding: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+/* ================= MOBILE ================= */
+@media (max-width: 768px) {
+  .tool-header h1 {
+    font-size: 1.9rem;
+  }
+
+  .meta-pills {
+    gap: 10px;
+  }
+}
