@@ -131,7 +131,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* Initial state */
   analyzeBtn.disabled = true;
-  resultsSection.style.display = "none";
+  resultsSection.classList.remove("show");
   renderUserKeywords(keywordList);
 
   /* ===== FILE UPLOAD ===== */
@@ -150,7 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
       columnCountEl.textContent = headers.length;
 
       analyzeBtn.disabled = false;
-      resultsSection.style.display = "none";
+      resultsSection.classList.remove("show");
     };
     reader.readAsText(file);
   };
@@ -206,8 +206,8 @@ document.addEventListener("DOMContentLoaded", () => {
     downloadOthers.onclick = () =>
       downloadCSV("other_contacts.csv", headers, others);
 
-    /* Reveal results (UX step completion) */
-    resultsSection.style.display = "block";
+    /* ✅ Correct reveal */
+    resultsSection.classList.add("show");
     resultsSection.scrollIntoView({ behavior: "smooth" });
   };
 });
