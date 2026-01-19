@@ -1,123 +1,99 @@
-const BASE_KEYWORDS = [
-  "realtor","realty","broker","brokerage","kw",
-  "coldwell","century","sotheby","estate","homes",
-  "remax","exp"
+/* ===============================
+   FILTER AGENT – FINAL JS
+================================ */
+
+let keywords = [
+  "remax","sutton","rlp","c21","century","coldwell","sotheby",
+  "exp","kw",
+  "real","realty","broker","brokerage",
+  "agent","realtor",
+  "home","homes","estate"
 ];
 
-const normalize = v => (v || "").toLowerCase();
+let rows = [];
+let headers = [];
+let results = { agents: [], possible: [], others: [] };
 
-let userKeywords = [...BASE_KEYWORDS];
+const norm = v => (v || "").toString().toLowerCase();
 
-document.addEventListener("DOMContentLoaded", () => {
-  const fileInput = document.getElementById("csvFile");
-  const analyzeBtn = document.getElementById("analyzeBtn");
-  const results = document.getElementById("resultsPreview");
+function score(row) {
+  let s = 0;
+  const email = norm(row.Email);
+  const company = norm(row.Company);
+  const name = `${norm(row["First Name"])} ${norm(row["Last Name"])}`;
 
-  const fileName = document.getElementById("fileName");
-  const rowCount = document.getElementById("rowCount");
-  const columnCount = document.getElementById("columnCount");
+  keywords.forEach(k => {
+    if (email.includes(k)) s += 3;
+    if (company.includes(k)) s += 3;
+    if (name.includes(k)) s += 2;
+  });
+  return s;
+}
 
-  const keywordInput = document.getElementById("newKeyword");
-  const keywordList = document.getElementById("keywordList");
-  const addKeywordBtn = document.getElementById("addKeywordBtn");
+document.getElementById("csvInput").addEventListener("change", e => {
+  Papa.parse(e.target.files[0], {
+    header: true,
+    skipEmptyLines: true,
+    complete: res => {
+      rows = res.data;
+      headers = Object.keys(rows[0]);
 
-  const agentCount = document.getElementById("agentCount");
-  const possibleCount = document.getElementById("possibleCount");
-  const otherCount = document.getElementById("otherCount");
-
-  const agentsTable = document.getElementById("agentsPreviewTable");
-  const possibleTable = document.getElementById("possiblePreviewTable");
-  const othersTable = document.getElementById("othersPreviewTable");
-
-  let headers = [];
-  let rows = [];
-
-  /* ===== KEYWORDS ===== */
-  const renderKeywords = () => {
-    keywordList.innerHTML = "";
-    userKeywords.forEach(k => {
-      const pill = document.createElement("span");
-      pill.className = "keyword-pill";
-      pill.textContent = `${k} ×`;
-      pill.onclick = () => {
-        userKeywords = userKeywords.filter(x => x !== k);
-        renderKeywords();
-      };
-      keywordList.appendChild(pill);
-    });
-  };
-
-  renderKeywords();
-
-  addKeywordBtn.onclick = () => {
-    const val = normalize(keywordInput.value);
-    if (val && !userKeywords.includes(val)) {
-      userKeywords.push(val);
-      keywordInput.value = "";
-      renderKeywords();
+      document.getElementById("fileName").textContent = e.target.files[0].name;
+      document.getElementById("rowCount").textContent = rows.length;
+      document.getElementById("colCount").textContent = headers.length;
     }
-  };
-
-  /* ===== CSV ===== */
-  fileInput.onchange = e => {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      const lines = reader.result.split("\n").map(r => r.split(","));
-      headers = lines[0];
-      rows = lines.slice(1);
-
-      fileName.textContent = `File — ${file.name}`;
-      rowCount.textContent = `Rows — ${rows.length}`;
-      columnCount.textContent = `Columns — ${headers.length}`;
-
-      analyzeBtn.disabled = false;
-    };
-
-    reader.readAsText(file);
-  };
-
-  analyzeBtn.onclick = () => {
-    const agents = [];
-    const possible = [];
-    const others = [];
-
-    rows.forEach(r => {
-      const combined = normalize(
-        `${r[0] || ""} ${r[1] || ""} ${r[2] || ""} ${r[3] || ""}`
-      );
-
-      let score = 0;
-      userKeywords.forEach(k => {
-        if (combined.includes(k)) score++;
-      });
-
-      if (score >= 2) agents.push(r);
-      else if (score === 1) possible.push(r);
-      else others.push(r);
-    });
-
-    agentCount.textContent = agents.length;
-    possibleCount.textContent = possible.length;
-    otherCount.textContent = others.length;
-
-    const renderTable = (table, data) => {
-      table.innerHTML = `
-        <thead><tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr></thead>
-        <tbody>
-          ${data.slice(0, 10).map(r =>
-            `<tr>${r.map(c => `<td>${c}</td>`).join("")}</tr>`
-          ).join("")}
-        </tbody>
-      `;
-    };
-
-    renderTable(agentsTable, agents);
-    renderTable(possibleTable, possible);
-    renderTable(othersTable, others);
-
-    results.classList.add("show");
-    results.scrollIntoView({ behavior: "smooth" });
-  };
+  });
 });
+
+function analyzeCSV() {
+  results = { agents: [], possible: [], others: [] };
+
+  rows.forEach(r => {
+    const s = score(r);
+    if (s >= 4) results.agents.push(r);
+    else if (s >= 2) results.possible.push(r);
+    else results.others.push(r);
+  });
+
+  render("agentsTable", results.agents);
+  render("possibleTable", results.possible);
+  render("othersTable", results.others);
+
+  document.getElementById("agentCount").textContent = results.agents.length;
+  document.getElementById("possibleCount").textContent = results.possible.length;
+  document.getElementById("otherCount").textContent = results.others.length;
+}
+
+function render(id, data) {
+  const table = document.getElementById(id);
+  table.innerHTML = "";
+
+  if (!data.length) return;
+
+  const tr = document.createElement("tr");
+  headers.forEach(h => {
+    const th = document.createElement("th");
+    th.textContent = h;
+    tr.appendChild(th);
+  });
+  table.appendChild(tr);
+
+  data.slice(0, 5).forEach(r => {
+    const row = document.createElement("tr");
+    headers.forEach(h => {
+      const td = document.createElement("td");
+      td.textContent = r[h] || "";
+      row.appendChild(td);
+    });
+    table.appendChild(row);
+  });
+}
+
+function download(type) {
+  const csv = Papa.unparse(results[type]);
+  const blob = new Blob([csv], { type: "text/csv" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `${type}.csv`;
+  a.click();
+}
