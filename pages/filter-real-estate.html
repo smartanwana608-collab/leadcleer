@@ -25,8 +25,11 @@
       margin: 0 auto;
     }
 
-    #resultsPreview .result-card {
-      margin-top: 32px;
+    #resultsPreview .results-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 40px;
+      margin-top: 40px;
     }
 
     #resultsPreview .preview-table {
@@ -132,66 +135,69 @@ HERO
       Preview of the first 10 records from each category. Download full CSVs below.
     </p>
 
-    <!-- AGENTS -->
-    <div class="result-card agents-card">
-      <div class="result-header">
-        <h3>Real Estate Agents</h3>
-        <span class="count-badge agent-badge">
-          <span id="agentCount">0</span> Found
-        </span>
+    <div class="results-grid">
+
+      <!-- AGENTS -->
+      <div class="result-card agents-card">
+        <div class="result-header">
+          <h3>Real Estate Agents</h3>
+          <span class="count-badge agent-badge">
+            <span id="agentCount">0</span> Found
+          </span>
+        </div>
+
+        <div class="table-wrap">
+          <table id="agentsPreviewTable" class="preview-table"></table>
+        </div>
+
+        <div class="result-actions">
+          <button id="downloadAgents" class="btn primary">
+            Download Agents CSV
+          </button>
+        </div>
       </div>
 
-      <div class="table-wrap">
-        <table id="agentsPreviewTable" class="preview-table"></table>
+      <!-- POSSIBLE AGENTS -->
+      <div class="result-card possible-card">
+        <div class="result-header">
+          <h3>Possible Agents</h3>
+          <span class="count-badge possible-badge">
+            <span id="possibleCount">0</span> Found
+          </span>
+        </div>
+
+        <div class="table-wrap">
+          <table id="possiblePreviewTable" class="preview-table"></table>
+        </div>
+
+        <div class="result-actions">
+          <button id="downloadPossible" class="btn secondary">
+            Download Possible Agents CSV
+          </button>
+        </div>
       </div>
 
-      <div class="result-actions">
-        <button id="downloadAgents" class="btn primary">
-          Download Agents CSV
-        </button>
+      <!-- OTHER CONTACTS -->
+      <div class="result-card other-card">
+        <div class="result-header">
+          <h3>Other Contacts</h3>
+          <span class="count-badge other-badge">
+            <span id="otherCount">0</span> Found
+          </span>
+        </div>
+
+        <div class="table-wrap">
+          <table id="othersPreviewTable" class="preview-table"></table>
+        </div>
+
+        <div class="result-actions">
+          <button id="downloadOthers" class="btn secondary">
+            Download Other Contacts CSV
+          </button>
+        </div>
       </div>
+
     </div>
-
-    <!-- POSSIBLE AGENTS -->
-    <div class="result-card possible-card">
-      <div class="result-header">
-        <h3>Possible Agents</h3>
-        <span class="count-badge possible-badge">
-          <span id="possibleCount">0</span> Found
-        </span>
-      </div>
-
-      <div class="table-wrap">
-        <table id="possiblePreviewTable" class="preview-table"></table>
-      </div>
-
-      <div class="result-actions">
-        <button id="downloadPossible" class="btn secondary">
-          Download Possible Agents CSV
-        </button>
-      </div>
-    </div>
-
-    <!-- OTHER CONTACTS -->
-    <div class="result-card other-card">
-      <div class="result-header">
-        <h3>Other Contacts</h3>
-        <span class="count-badge other-badge">
-          <span id="otherCount">0</span> Found
-        </span>
-      </div>
-
-      <div class="table-wrap">
-        <table id="othersPreviewTable" class="preview-table"></table>
-      </div>
-
-      <div class="result-actions">
-        <button id="downloadOthers" class="btn secondary">
-          Download Other Contacts CSV
-        </button>
-      </div>
-    </div>
-
   </section>
 
 </main>
