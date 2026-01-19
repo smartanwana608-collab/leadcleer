@@ -1,11 +1,22 @@
 /* =====================================================
-FILTER REAL ESTATE AGENTS — FINAL, CLEAN, ISOLATED
-Affects ONLY filter-real-estate.html
+FILTER REAL ESTATE AGENTS — FINAL, HARD-SCOPED
+Does NOT affect any other page
 ===================================================== */
 
 /* ================= PAGE SCOPE ================= */
 .filter-agents-page {
   background: var(--bg);
+}
+
+/* ================= NEUTRALIZE MAIN.CSS ================= */
+.filter-agents-page section {
+  padding: 0 !important;
+}
+
+.filter-agents-page h2 {
+  text-align: left;
+  font-size: 1.35rem;
+  margin: 0 0 24px 0;
 }
 
 /* ================= MAIN CONTAINER ================= */
@@ -18,7 +29,7 @@ Affects ONLY filter-real-estate.html
 /* ================= HEADER ================= */
 .filter-agents-page .tool-header {
   text-align: center;
-  margin-bottom: 64px;
+  margin-bottom: 72px;
 }
 
 .filter-agents-page .tool-header h1 {
@@ -31,24 +42,23 @@ Affects ONLY filter-real-estate.html
   max-width: 640px;
   margin: 0 auto;
   color: var(--muted);
-  font-size: 1rem;
 }
 
-/* ================= STEP WRAPPER ================= */
+/* ================= STEPS ================= */
 .filter-agents-page .tool-step {
   display: flex;
   justify-content: center;
-  margin-bottom: 64px;
+  margin-bottom: 72px;
 }
 
 .filter-agents-page .tool-step:last-child {
   margin-bottom: 0;
 }
 
-/* ================= STEP TITLES ================= */
+/* ================= STEP TITLE ================= */
 .filter-agents-page .step-title {
   text-align: center;
-  font-size: 1.35rem;
+  font-size: 1.4rem;
   font-weight: 700;
   margin-bottom: 28px;
 }
@@ -59,66 +69,48 @@ Affects ONLY filter-real-estate.html
   background: #0c1022;
   border: 1px solid var(--border);
   border-radius: 18px;
-  padding: 32px;
+  padding: 36px;
 }
 
 /* ================= UPLOAD ================= */
-.filter-agents-page .upload-card {
-  display: flex;
-  justify-content: center;
-}
-
 .filter-agents-page .upload-box {
-  width: 100%;
   max-width: 520px;
-  padding: 40px;
+  margin: 0 auto;
+  padding: 42px;
   border-radius: 16px;
   border: 1px dashed var(--border);
   background: #0b0f22;
   text-align: center;
 }
 
-.filter-agents-page .upload-box input[type="file"] {
-  margin-bottom: 14px;
-}
-
 .filter-agents-page .upload-hint {
-  font-size: 0.9rem;
+  margin-top: 10px;
   color: var(--muted);
 }
 
 /* ================= META ================= */
-.filter-agents-page .meta-card {
-  display: flex;
-  justify-content: center;
-}
-
 .filter-agents-page .meta-pills {
   display: flex;
   gap: 14px;
-  flex-wrap: wrap;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
 .filter-agents-page .meta-pill {
-  background: #ffffff;
+  background: #fff;
   color: #0b0d12;
   padding: 8px 16px;
   border-radius: 999px;
-  font-size: 0.85rem;
   font-weight: 600;
+  font-size: 0.85rem;
 }
 
 /* ================= KEYWORDS ================= */
-.filter-agents-page .keywords-card {
-  text-align: center;
-}
-
 .filter-agents-page .keywords-info {
+  text-align: center;
   max-width: 600px;
   margin: 0 auto 22px;
   color: var(--muted);
-  font-size: 0.95rem;
 }
 
 .filter-agents-page .keyword-list {
@@ -133,7 +125,6 @@ Affects ONLY filter-real-estate.html
   background: rgba(255,255,255,0.12);
   padding: 6px 12px;
   border-radius: 999px;
-  font-size: 0.85rem;
 }
 
 .filter-agents-page .keyword-add {
@@ -142,22 +133,13 @@ Affects ONLY filter-real-estate.html
   gap: 10px;
 }
 
-.filter-agents-page .keyword-add input {
-  max-width: 260px;
-}
-
 /* ================= ANALYZE ================= */
 .filter-agents-page .analyze-card {
   text-align: center;
 }
 
-.filter-agents-page .analyze-card .btn.primary {
-  padding: 16px 40px;
-  font-size: 1rem;
-}
-
 .filter-agents-page .analyze-summary {
-  margin-top: 22px;
+  margin-top: 24px;
   display: flex;
   justify-content: center;
   gap: 14px;
@@ -166,14 +148,15 @@ Affects ONLY filter-real-estate.html
 
 /* ================= RESULTS ================= */
 .filter-agents-page .results-step {
-  margin-top: 96px;
+  margin-top: 100px;
 }
 
 .filter-agents-page .results-title {
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 48px;
 }
 
+/* ================= RESULT GRID ================= */
 .filter-agents-page .results-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -188,25 +171,17 @@ Affects ONLY filter-real-estate.html
   padding: 28px;
 }
 
-.filter-agents-page .result-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-/* ================= TABLE (PROTOTYPE STYLE) ================= */
+/* ================= TABLE ================= */
 .filter-agents-page .table-wrap {
   max-height: 320px;
-  overflow-x: auto;
-  overflow-y: auto;
+  overflow: auto;
   background: #0b0f22;
   border-radius: 12px;
 }
 
 .filter-agents-page .preview-table {
-  min-width: 100%;
   width: max-content;
+  min-width: 100%;
   border-collapse: collapse;
   font-size: 13px;
 }
@@ -216,9 +191,7 @@ Affects ONLY filter-real-estate.html
   top: 0;
   background: #0c1022;
   padding: 10px;
-  text-align: left;
   color: var(--muted);
-  border-bottom: 1px solid var(--border);
 }
 
 .filter-agents-page .preview-table td {
@@ -227,10 +200,19 @@ Affects ONLY filter-real-estate.html
   white-space: nowrap;
 }
 
-/* ================= RESULT ACTIONS ================= */
+/* ================= ACTIONS ================= */
 .filter-agents-page .result-actions {
   margin-top: 18px;
   text-align: right;
+}
+
+/* ================= RESULTS VISIBILITY ================= */
+.filter-agents-page #resultsPreview {
+  display: none;
+}
+
+.filter-agents-page #resultsPreview.show {
+  display: block;
 }
 
 /* ================= MOBILE ================= */
@@ -246,20 +228,4 @@ Affects ONLY filter-real-estate.html
   .filter-agents-page .upload-box {
     padding: 28px;
   }
-}
-/* ================= HARD OVERRIDES ================= */
-
-/* Kill global section padding from main.css */
-.filter-agents-page section {
-  padding: 0 !important;
-}
-
-/* Hide results until JS populates */
-.filter-agents-page #resultsPreview {
-  display: none;
-}
-
-/* Show results once analysis runs */
-.filter-agents-page #resultsPreview.show {
-  display: block;
 }
