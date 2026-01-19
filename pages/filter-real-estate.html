@@ -4,11 +4,7 @@
   <meta charset="UTF-8" />
   <title>Filter Real Estate Agents | Leadcleer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- Global CSS -->
   <link rel="stylesheet" href="../assets/css/main.css" />
-  <!-- Tool CSS -->
-  <link rel="stylesheet" href="../assets/css/filter-agents.css" />
 </head>
 
 <body class="filter-agents-page">
@@ -31,25 +27,23 @@
   <header class="tool-header">
     <h1>Filter Real Estate Agents</h1>
     <p class="tool-subtitle">
-      Upload a CSV and intelligently classify contacts using confidence-based detection.
+      Upload a CSV and accurately split real estate agents from other contacts.
     </p>
   </header>
 
-  <!-- STEP 1 -->
   <section class="tool-step">
     <div class="tool-card">
-      <h2 class="step-title">1. Upload CSV</h2>
+      <h2>1. Upload CSV</h2>
       <div class="upload-box">
         <input type="file" id="csvFile" accept=".csv" />
-        <p class="upload-hint">Choose a CSV file from your computer</p>
+        <p>Choose a CSV file from your computer</p>
       </div>
     </div>
   </section>
 
-  <!-- STEP 2 -->
   <section class="tool-step">
     <div class="tool-card">
-      <h2 class="step-title">2. File Overview</h2>
+      <h2>2. File Overview</h2>
       <div class="meta-pills">
         <span id="fileName" class="meta-pill">File —</span>
         <span id="rowCount" class="meta-pill">Rows —</span>
@@ -58,32 +52,22 @@
     </div>
   </section>
 
-  <!-- STEP 3 -->
   <section class="tool-step">
     <div class="tool-card">
-      <h2 class="step-title">3. Optional Keywords</h2>
-      <p class="keywords-info">
-        Keywords are matched across <strong>Email, Company, and Name</strong>.
-      </p>
-
+      <h2>3. Detection Keywords</h2>
+      <p>Matched across name, company, and email.</p>
       <div id="keywordList" class="keyword-list"></div>
-
       <div class="keyword-add">
-        <input id="newKeyword" type="text" placeholder="Add keyword (e.g. remax)" />
+        <input id="newKeyword" placeholder="Add keyword" />
         <button id="addKeywordBtn" class="btn secondary">Add</button>
       </div>
     </div>
   </section>
 
-  <!-- STEP 4 -->
   <section class="tool-step">
-    <div class="tool-card analyze-card">
-      <h2 class="step-title">4. Analyze</h2>
-
-      <button id="analyzeBtn" class="btn primary" disabled>
-        Analyze CSV
-      </button>
-
+    <div class="tool-card">
+      <h2>4. Analyze</h2>
+      <button id="analyzeBtn" class="btn primary" disabled>Analyze CSV</button>
       <div class="analyze-summary">
         <span class="meta-pill"><strong id="agentCount">0</strong> Agents</span>
         <span class="meta-pill"><strong id="possibleCount">0</strong> Possible</span>
@@ -92,10 +76,9 @@
     </div>
   </section>
 
-  <!-- STEP 5 -->
   <section class="tool-step results-step" id="resultsPreview">
     <div class="tool-card">
-      <h2 class="results-title">Results Preview</h2>
+      <h2>Results Preview</h2>
 
       <div class="results-grid">
 
@@ -104,7 +87,6 @@
           <div class="table-wrap">
             <table id="agentsPreviewTable" class="preview-table"></table>
           </div>
-          <button id="downloadAgents" class="btn primary">Download Agents CSV</button>
         </div>
 
         <div class="result-card">
@@ -112,7 +94,6 @@
           <div class="table-wrap">
             <table id="possiblePreviewTable" class="preview-table"></table>
           </div>
-          <button id="downloadPossible" class="btn secondary">Download Possible CSV</button>
         </div>
 
         <div class="result-card">
@@ -120,7 +101,6 @@
           <div class="table-wrap">
             <table id="othersPreviewTable" class="preview-table"></table>
           </div>
-          <button id="downloadOthers" class="btn secondary">Download Others CSV</button>
         </div>
 
       </div>
@@ -138,22 +118,7 @@
       </div>
       <p class="footer-tagline">Turn messy CSVs into clean, usable leads — fast.</p>
     </div>
-
-    <div class="footer-links">
-      <div class="footer-column">
-        <strong>Product</strong>
-        <a href="../features.html">Features</a>
-        <a href="../pricing.html">Pricing</a>
-      </div>
-
-      <div class="footer-column">
-        <strong>Legal</strong>
-        <a href="javascript:void(0)">Privacy Policy</a>
-        <a href="javascript:void(0)">Terms</a>
-      </div>
-    </div>
   </div>
-
   <div class="footer-bottom">
     © 2026 Leadcleer. All rights reserved.
   </div>
