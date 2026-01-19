@@ -5,7 +5,7 @@
   <title>Prompt Tool | Leadcleer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Global CSS ONLY -->
+  <!-- Global CSS -->
   <link rel="stylesheet" href="../assets/css/main.css" />
 </head>
 
@@ -28,97 +28,74 @@ NAV
 </header>
 
 <!-- ===============================
-MAIN CONTAINER
+PROMPT TOOL
 ================================ -->
 <main class="tool-container">
 
-  <!-- ===============================
-  HEADER
-  ================================ -->
+  <!-- HEADER -->
   <header class="tool-header">
     <h1>Prompt Tool</h1>
     <p class="tool-subtitle">
-      Type what you want to do with your CSV.
-      We’ll match it to the closest available action.
+      Type what you want to do with your CSV.  
+      Leadcleer will match it to the closest available action.
     </p>
   </header>
 
-  <!-- ===============================
-  PROMPT INPUT
-  ================================ -->
-  <section class="tool-card">
-    <h2 class="step-title">What do you want to do?</h2>
+  <!-- STEP 1: UPLOAD CSV -->
+  <section class="tool-step">
+    <div class="tool-card">
+      <h2 class="step-title">1. Upload CSV</h2>
 
-    <textarea
-      id="userPrompt"
-      placeholder="Example: remove duplicate emails"
-      rows="3"
-    ></textarea>
-
-    <button id="runPromptBtn" class="btn primary">
-      Run Action
-    </button>
-  </section>
-
-  <!-- ===============================
-  AVAILABLE ACTIONS (VISIBLE)
-  ================================ -->
-  <section class="tool-card">
-    <h2 class="step-title">Available Actions</h2>
-
-    <p class="keywords-info">
-      Copy and use one of these actions in your prompt.
-    </p>
-
-    <ul id="availableActions" class="action-list">
-      <li>remove duplicates</li>
-      <li>remove missing emails</li>
-      <li>split by column</li>
-      <li>create column</li>
-      <li>extract house numbers</li>
-      <li>fix addresses</li>
-      <li>filter real estate agents</li>
-    </ul>
-  </section>
-
-  <!-- ===============================
-  SYSTEM RESPONSE
-  ================================ -->
-  <section class="tool-card" id="systemResponse">
-    <h2 class="step-title">System Response</h2>
-    <div id="responseText" class="response-box">
-      Waiting for your prompt…
+      <input type="file" id="csvFile" accept=".csv" />
+      <p class="upload-hint">Your file stays in your browser.</p>
     </div>
   </section>
 
-  <!-- ===============================
-  PREVIEW
-  ================================ -->
-  <section class="tool-card" id="previewSection">
-    <h2 class="step-title">Preview</h2>
+  <!-- STEP 2: PROMPT -->
+  <section class="tool-step">
+    <div class="tool-card">
+      <h2 class="step-title">2. Enter Prompt</h2>
 
-    <div class="table-wrap">
-      <table id="previewTable" class="preview-table"></table>
-    </div>
-  </section>
+      <textarea
+        id="promptInput"
+        rows="3"
+        placeholder="e.g. filter real estate agents"
+      ></textarea>
 
-  <!-- ===============================
-  DOWNLOAD ACTIONS
-  ================================ -->
-  <section class="tool-card" id="downloadSection">
-    <h2 class="step-title">Download</h2>
-
-    <div class="download-actions">
-      <button id="downloadPrimary" class="btn primary">
-        Download Result
+      <button id="runPromptBtn" class="btn primary" disabled>
+        Run Prompt
       </button>
+    </div>
+  </section>
+
+  <!-- STEP 3: AVAILABLE ACTIONS -->
+  <section class="tool-step">
+    <div class="tool-card">
+      <h2 class="step-title">Available Actions</h2>
+
+      <ul id="availableActions" class="action-list">
+        <!-- Filled by JS -->
+      </ul>
+
+      <p class="muted-text">
+        Tip: copy an action name if you're unsure what to type.
+      </p>
+    </div>
+  </section>
+
+  <!-- STEP 4: RESULTS -->
+  <section class="tool-step" id="promptResults" style="display:none;">
+    <div class="tool-card">
+      <h2 class="step-title">Result</h2>
+
+      <pre id="resultOutput"></pre>
     </div>
   </section>
 
 </main>
 
 <!-- ===============================
-FOOTER (GLOBAL)
+FOOTER
 ================================ -->
 <footer class="footer">
   <div class="footer-container">
@@ -128,23 +105,8 @@ FOOTER (GLOBAL)
         <span class="logo-text">Leadcleer</span>
       </div>
       <p class="footer-tagline">
-        Turn messy CSVs into clean, usable leads — fast.
+        Clean data. Better decisions.
       </p>
-    </div>
-
-    <div class="footer-links">
-      <div class="footer-column">
-        <strong>Product</strong>
-        <a href="../features.html">Features</a>
-        <a href="../pricing.html">Pricing</a>
-        <a href="../how-it-works.html">How It Works</a>
-      </div>
-
-      <div class="footer-column">
-        <strong>Legal</strong>
-        <a href="#">Privacy Policy</a>
-        <a href="#">Terms & Conditions</a>
-      </div>
     </div>
   </div>
 
@@ -156,7 +118,53 @@ FOOTER (GLOBAL)
 <!-- ===============================
 SCRIPT
 ================================ -->
-<script src="../assets/js/prompt-engine.js"></script>
+<script type="module">
+  import { runPrompt, getAvailableActions } from "../assets/js/prompt-engine.js";
+
+  const csvInput = document.getElementById("csvFile");
+  const runBtn = document.getElementById("runPromptBtn");
+  const promptInput = document.getElementById("promptInput");
+  const resultBox = document.getElementById("promptResults");
+  const resultOutput = document.getElementById("resultOutput");
+  const actionsList = document.getElementById("availableActions");
+
+  let headers = [];
+  let rows = [];
+
+  /* Populate available actions */
+  getAvailableActions().forEach(action => {
+    const li = document.createElement("li");
+    li.textContent = action;
+    actionsList.appendChild(li);
+  });
+
+  /* Parse CSV */
+  function parseCSV(text) {
+    return text.split("\n").map(r => r.split(","));
+  }
+
+  csvInput.onchange = e => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const data = parseCSV(reader.result);
+      headers = data[0] || [];
+      rows = data.slice(1);
+      runBtn.disabled = false;
+    };
+    reader.readAsText(e.target.files[0]);
+  };
+
+  /* Run prompt */
+  runBtn.onclick = () => {
+    const prompt = promptInput.value.trim();
+    if (!prompt) return;
+
+    const response = runPrompt({ prompt, headers, rows });
+
+    resultBox.style.display = "block";
+    resultOutput.textContent = JSON.stringify(response, null, 2);
+  };
+</script>
 
 </body>
 </html>
