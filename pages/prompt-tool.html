@@ -68,13 +68,15 @@ PROMPT TOOL
     </div>
   </section>
 
-  <!-- STEP 3: AVAILABLE ACTIONS -->
+  <!-- STEP 3: AVAILABLE ACTIONS (STATIC FOR NOW) -->
   <section class="tool-step">
     <div class="tool-card">
       <h2 class="step-title">Available Actions</h2>
 
-      <ul id="availableActions" class="action-list">
-        <!-- Filled by JS -->
+      <ul class="action-list">
+        <li>filter real estate</li>
+        <li>remove duplicates</li>
+        <li>remove missing emails</li>
       </ul>
 
       <p class="muted-text">
@@ -84,13 +86,7 @@ PROMPT TOOL
   </section>
 
   <!-- STEP 4: RESULTS -->
-  <section class="tool-step" id="promptResults" style="display:none;">
-    <div class="tool-card">
-      <h2 class="step-title">Result</h2>
-
-      <pre id="resultOutput"></pre>
-    </div>
-  </section>
+  <section class="tool-step" id="promptResults" style="display:none;"></section>
 
 </main>
 
@@ -116,54 +112,44 @@ FOOTER
 </footer>
 
 <!-- ===============================
-SCRIPT
+SCRIPT (CSV → Prompt Engine Bridge)
 ================================ -->
 <script type="module">
-  import { runPrompt, getAvailableActions } from "../assets/js/prompt-engine.js";
+  import "../assets/js/prompt-engine.js";
 
   const csvInput = document.getElementById("csvFile");
   const runBtn = document.getElementById("runPromptBtn");
-  const promptInput = document.getElementById("promptInput");
-  const resultBox = document.getElementById("promptResults");
-  const resultOutput = document.getElementById("resultOutput");
-  const actionsList = document.getElementById("availableActions");
 
-  let headers = [];
-  let rows = [];
+  runBtn.disabled = true;
 
-  /* Populate available actions */
-  getAvailableActions().forEach(action => {
-    const li = document.createElement("li");
-    li.textContent = action;
-    actionsList.appendChild(li);
-  });
-
-  /* Parse CSV */
-  function parseCSV(text) {
-    return text.split("\n").map(r => r.split(","));
-  }
-
-  csvInput.onchange = e => {
+  csvInput.addEventListener("change", e => {
     const reader = new FileReader();
+
     reader.onload = () => {
-      const data = parseCSV(reader.result);
-      headers = data[0] || [];
-      rows = data.slice(1);
+      const lines = reader.result.split("\n").filter(Boolean);
+      const headers = lines[0].split(",");
+
+      const rows = lines.slice(1).map(line => {
+        const values = line.split(",");
+        const obj = {};
+        headers.forEach((h, i) => {
+          obj[h.trim()] = values[i]?.trim() || "";
+        });
+        return obj;
+      });
+
+      // 🔥 CRITICAL EVENT
+      document.dispatchEvent(
+        new CustomEvent("csvParsed", {
+          detail: { rows }
+        })
+      );
+
       runBtn.disabled = false;
     };
+
     reader.readAsText(e.target.files[0]);
-  };
-
-  /* Run prompt */
-  runBtn.onclick = () => {
-    const prompt = promptInput.value.trim();
-    if (!prompt) return;
-
-    const response = runPrompt({ prompt, headers, rows });
-
-    resultBox.style.display = "block";
-    resultOutput.textContent = JSON.stringify(response, null, 2);
-  };
+  });
 </script>
 
 </body>
