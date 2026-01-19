@@ -7,15 +7,12 @@
 
   <!-- Global CSS -->
   <link rel="stylesheet" href="../assets/css/main.css" />
-  <!-- Tool-specific CSS -->
+  <!-- Tool CSS -->
   <link rel="stylesheet" href="../assets/css/filter-agents.css" />
 </head>
 
 <body class="filter-agents-page">
 
-<!-- ===============================
-TOP NAV
-================================ -->
 <header class="nav">
   <div class="nav-container">
     <div class="logo">Leadcleer</div>
@@ -29,12 +26,8 @@ TOP NAV
   </div>
 </header>
 
-<!-- ===============================
-FILTER TOOL
-================================ -->
 <main class="tool-container">
 
-  <!-- TOOL HEADER -->
   <header class="tool-header">
     <h1>Filter Real Estate Agents</h1>
     <p class="tool-subtitle">
@@ -42,11 +35,10 @@ FILTER TOOL
     </p>
   </header>
 
-  <!-- STEP 1 — UPLOAD -->
+  <!-- STEP 1 -->
   <section class="tool-step">
-    <div class="tool-card upload-card">
+    <div class="tool-card">
       <h2 class="step-title">1. Upload CSV</h2>
-
       <div class="upload-box">
         <input type="file" id="csvFile" accept=".csv" />
         <p class="upload-hint">Choose a CSV file from your computer</p>
@@ -54,11 +46,10 @@ FILTER TOOL
     </div>
   </section>
 
-  <!-- STEP 2 — FILE OVERVIEW -->
+  <!-- STEP 2 -->
   <section class="tool-step">
-    <div class="tool-card meta-card">
+    <div class="tool-card">
       <h2 class="step-title">2. File Overview</h2>
-
       <div class="meta-pills">
         <span id="fileName" class="meta-pill">File —</span>
         <span id="rowCount" class="meta-pill">Rows —</span>
@@ -67,30 +58,24 @@ FILTER TOOL
     </div>
   </section>
 
-  <!-- STEP 3 — KEYWORDS -->
+  <!-- STEP 3 -->
   <section class="tool-step">
-    <div class="tool-card keywords-card">
+    <div class="tool-card">
       <h2 class="step-title">3. Optional Keywords</h2>
-
       <p class="keywords-info">
         Keywords are matched across <strong>Email, Company, and Name</strong>.
-        System keywords are applied automatically.
       </p>
 
       <div id="keywordList" class="keyword-list"></div>
 
       <div class="keyword-add">
-        <input
-          id="newKeyword"
-          type="text"
-          placeholder="Add keyword (e.g. remax)"
-        />
+        <input id="newKeyword" type="text" placeholder="Add keyword (e.g. remax)" />
         <button id="addKeywordBtn" class="btn secondary">Add</button>
       </div>
     </div>
   </section>
 
-  <!-- STEP 4 — ANALYZE -->
+  <!-- STEP 4 -->
   <section class="tool-step">
     <div class="tool-card analyze-card">
       <h2 class="step-title">4. Analyze</h2>
@@ -107,62 +92,35 @@ FILTER TOOL
     </div>
   </section>
 
-  <!-- STEP 5 — RESULTS -->
+  <!-- STEP 5 -->
   <section class="tool-step results-step" id="resultsPreview">
-    <div class="tool-card results-card">
+    <div class="tool-card">
       <h2 class="results-title">Results Preview</h2>
 
       <div class="results-grid">
 
-        <!-- AGENTS -->
         <div class="result-card">
-          <div class="result-header">
-            <h3>Real Estate Agents</h3>
-          </div>
-
+          <h3>Real Estate Agents</h3>
           <div class="table-wrap">
             <table id="agentsPreviewTable" class="preview-table"></table>
           </div>
-
-          <div class="result-actions">
-            <button id="downloadAgents" class="btn primary">
-              Download Agents CSV
-            </button>
-          </div>
+          <button id="downloadAgents" class="btn primary">Download Agents CSV</button>
         </div>
 
-        <!-- POSSIBLE -->
         <div class="result-card">
-          <div class="result-header">
-            <h3>Possible Agents</h3>
-          </div>
-
+          <h3>Possible Agents</h3>
           <div class="table-wrap">
             <table id="possiblePreviewTable" class="preview-table"></table>
           </div>
-
-          <div class="result-actions">
-            <button id="downloadPossible" class="btn secondary">
-              Download Possible CSV
-            </button>
-          </div>
+          <button id="downloadPossible" class="btn secondary">Download Possible CSV</button>
         </div>
 
-        <!-- OTHERS -->
         <div class="result-card">
-          <div class="result-header">
-            <h3>Other Contacts</h3>
-          </div>
-
+          <h3>Other Contacts</h3>
           <div class="table-wrap">
             <table id="othersPreviewTable" class="preview-table"></table>
           </div>
-
-          <div class="result-actions">
-            <button id="downloadOthers" class="btn secondary">
-              Download Others CSV
-            </button>
-          </div>
+          <button id="downloadOthers" class="btn secondary">Download Others CSV</button>
         </div>
 
       </div>
@@ -171,9 +129,6 @@ FILTER TOOL
 
 </main>
 
-<!-- ===============================
-FOOTER
-================================ -->
 <footer class="footer">
   <div class="footer-container">
     <div class="footer-brand">
@@ -181,9 +136,7 @@ FOOTER
         <span class="logo-dot"></span>
         <span class="logo-text">Leadcleer</span>
       </div>
-      <p class="footer-tagline">
-        Turn messy CSVs into clean, usable leads — fast.
-      </p>
+      <p class="footer-tagline">Turn messy CSVs into clean, usable leads — fast.</p>
     </div>
 
     <div class="footer-links">
@@ -191,20 +144,12 @@ FOOTER
         <strong>Product</strong>
         <a href="../features.html">Features</a>
         <a href="../pricing.html">Pricing</a>
-        <a href="../how-it-works.html">How It Works</a>
       </div>
 
       <div class="footer-column">
         <strong>Legal</strong>
-        <a href="#">Privacy Policy</a>
-        <a href="#">Terms & Conditions</a>
-      </div>
-
-      <div class="footer-column">
-        <strong>Contact</strong>
-        <a href="mailto:smartanwana608@gmail.com">
-          smartanwana608@gmail.com
-        </a>
+        <a href="javascript:void(0)">Privacy Policy</a>
+        <a href="javascript:void(0)">Terms</a>
       </div>
     </div>
   </div>
@@ -214,8 +159,6 @@ FOOTER
   </div>
 </footer>
 
-<!-- SCRIPT -->
 <script src="../assets/js/filter-agents.js"></script>
-
 </body>
 </html>
