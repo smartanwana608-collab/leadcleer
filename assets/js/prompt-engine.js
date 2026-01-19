@@ -1,8 +1,12 @@
-// js/prompt-engine.js
+// assets/js/prompt-engine.js
 
-import { filterRealEstate } from "../actions/filter-real-estate.js";
+import { filterRealEstate } from "./actions/filter-real-estate.js";
+import { removeDuplicates } from "./actions/remove-duplicates.js";
+import { removeMissingEmails } from "./actions/remove-missing-emails.js";
 
 let parsedRows = [];
+
+/* ================= ACTION REGISTRY ================= */
 
 const ACTIONS = [
   {
@@ -13,10 +17,31 @@ const ACTIONS = [
       "real estate",
       "realty",
       "agents",
-      "brokerage"
+      "brokerage",
+      "broker"
+    ]
+  },
+  {
+    name: "remove duplicates",
+    handler: removeDuplicates,
+    aliases: [
+      "remove duplicates",
+      "dedupe",
+      "delete duplicates"
+    ]
+  },
+  {
+    name: "remove missing emails",
+    handler: removeMissingEmails,
+    aliases: [
+      "remove missing emails",
+      "clean emails",
+      "delete empty emails"
     ]
   }
 ];
+
+/* ================= HELPERS ================= */
 
 function normalize(text) {
   return text.toLowerCase().trim();
@@ -26,15 +51,15 @@ function matchAction(prompt) {
   const input = normalize(prompt);
 
   for (const action of ACTIONS) {
-    if (
-      action.aliases.some(alias => input.includes(alias))
-    ) {
+    if (action.aliases.some(alias => input.includes(alias))) {
       return action;
     }
   }
 
   return null;
 }
+
+/* ================= RENDERING ================= */
 
 function renderResults(result) {
   const container = document.getElementById("promptResults");
@@ -47,29 +72,20 @@ function renderResults(result) {
     <h2>${result.title}</h2>
     <p>${result.summary}</p>
 
-    <h3>Real Estate Agents</h3>
-    ${renderTable(result.preview.agents)}
-
-    <h3>Possible Agents</h3>
-    ${renderTable(result.preview.possibleAgents)}
-
-    <h3>Other Contacts</h3>
-    ${renderTable(result.preview.others)}
+    <h3>Preview</h3>
+    ${renderTable(result.preview)}
 
     <div class="download-actions">
-      <button class="btn primary" onclick="downloadCSV('agents')">Download Agents CSV</button>
-      <button class="btn secondary" onclick="downloadCSV('possibleAgents')">Download Possible CSV</button>
-      <button class="btn secondary" onclick="downloadCSV('others')">Download Others CSV</button>
+      <button class="btn primary" onclick="downloadCSV()">Download CSV</button>
     </div>
   `;
 
   container.appendChild(section);
-
-  window.__DOWNLOAD_DATA__ = result.downloads;
+  window.__DOWNLOAD_DATA__ = result.download;
 }
 
 function renderTable(rows) {
-  if (!rows.length) return "<p>No rows</p>";
+  if (!rows || !rows.length) return "<p>No rows found.</p>";
 
   const headers = Object.keys(rows[0]);
 
@@ -83,11 +99,12 @@ function renderTable(rows) {
         </thead>
         <tbody>
           ${rows
+            .slice(0, 5)
             .map(
               row =>
-                `<tr>${headers
-                  .map(h => `<td>${row[h] ?? ""}</td>`)
-                  .join("")}</tr>`
+                `<tr>
+                  ${headers.map(h => `<td>${row[h] ?? ""}</td>`).join("")}
+                </tr>`
             )
             .join("")}
         </tbody>
@@ -96,8 +113,10 @@ function renderTable(rows) {
   `;
 }
 
-window.downloadCSV = function (type) {
-  const rows = window.__DOWNLOAD_DATA__[type];
+/* ================= DOWNLOAD ================= */
+
+window.downloadCSV = function () {
+  const rows = window.__DOWNLOAD_DATA__;
   if (!rows || !rows.length) return;
 
   const headers = Object.keys(rows[0]);
@@ -111,11 +130,13 @@ window.downloadCSV = function (type) {
 
   const a = document.createElement("a");
   a.href = url;
-  a.download = `${type}.csv`;
+  a.download = "result.csv";
   a.click();
 
   URL.revokeObjectURL(url);
 };
+
+/* ================= EVENTS ================= */
 
 document.addEventListener("DOMContentLoaded", () => {
   const runBtn = document.getElementById("runPromptBtn");
@@ -129,7 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="tool-card">
           <p>
             We don’t have an action for that yet.<br />
-            Try one of the available actions below.
+            Try one of the available actions.
           </p>
         </div>
       `;
