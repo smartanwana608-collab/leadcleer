@@ -10,9 +10,49 @@ function saveKeywords() {
 }
 
 function normalize(v) {
-  return (v || "").toString().toLowerCase();
+  return (v || "").toString().toLowerCase().trim();
 }
 
+/* ================= SAFE CSV PARSER ================= */
+function parseCSV(text) {
+  const rows = [];
+  let row = [];
+  let value = "";
+  let insideQuotes = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const next = text[i + 1];
+
+    if (char === '"' && insideQuotes && next === '"') {
+      value += '"';
+      i++;
+    } else if (char === '"') {
+      insideQuotes = !insideQuotes;
+    } else if (char === "," && !insideQuotes) {
+      row.push(value);
+      value = "";
+    } else if ((char === "\n" || char === "\r") && !insideQuotes) {
+      if (value || row.length) {
+        row.push(value);
+        rows.push(row);
+        row = [];
+        value = "";
+      }
+    } else {
+      value += char;
+    }
+  }
+
+  if (value || row.length) {
+    row.push(value);
+    rows.push(row);
+  }
+
+  return rows;
+}
+
+/* ================= PREVIEW ================= */
 function renderPreview(tableEl, headers, rows, limit = 10) {
   tableEl.innerHTML = "";
   if (!rows.length) {
@@ -43,6 +83,7 @@ function renderPreview(tableEl, headers, rows, limit = 10) {
   tableEl.appendChild(tbody);
 }
 
+/* ================= MAIN ================= */
 document.addEventListener("DOMContentLoaded", () => {
   const fileInput = document.getElementById("csvFile");
   const analyzeBtn = document.getElementById("analyzeBtn");
@@ -67,9 +108,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const newKeyword = document.getElementById("newKeyword");
   const addKeywordBtn = document.getElementById("addKeywordBtn");
 
-  let headers = [], rows = [];
+  let headers = [];
   let agents = [], possible = [], others = [];
 
+  /* ===== Keyword UI ===== */
   function renderKeywords() {
     keywordList.innerHTML = "";
     keywords.forEach((k, i) => {
@@ -89,7 +131,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   addKeywordBtn.onclick = () => {
-    const v = newKeyword.value.trim().toLowerCase();
+    const v = normalize(newKeyword.value);
     if (!v || keywords.includes(v)) return;
     keywords.push(v);
     saveKeywords();
@@ -110,28 +152,16 @@ document.addEventListener("DOMContentLoaded", () => {
   analyzeBtn.onclick = () => {
     const reader = new FileReader();
     reader.onload = e => {
-      const parsed = e.target.result.trim().split("\n").map(r => r.split(","));
+      const parsed = parseCSV(e.target.result.trim());
       headers = parsed[0];
-      rows = parsed.slice(1);
+      const rows = parsed.slice(1);
 
       rowCountEl.textContent = "Total rows: " + rows.length;
       columnCountEl.textContent = "Detected columns: " + headers.length;
 
-      const emailCols = headers
-        .map((h, i) => normalize(h).includes("email") ? i : null)
-        .filter(i => i !== null);
-
-      const nameCols = headers
-        .map((h, i) =>
-          ["name","first","last"].some(k => normalize(h).includes(k)) ? i : null
-        )
-        .filter(i => i !== null);
-
-      const companyCols = headers
-        .map((h, i) =>
-          ["company","office","brokerage","organization"].some(k => normalize(h).includes(k)) ? i : null
-        )
-        .filter(i => i !== null);
+      const emailCols = headers.map((h,i)=>normalize(h).includes("email")?i:null).filter(i=>i!==null);
+      const nameCols = headers.map((h,i)=>["name","first","last"].some(k=>normalize(h).includes(k))?i:null).filter(i=>i!==null);
+      const companyCols = headers.map((h,i)=>["company","office","brokerage","organization"].some(k=>normalize(h).includes(k))?i:null).filter(i=>i!==null);
 
       const extendedHeaders = [
         ...headers,
@@ -146,21 +176,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
       rows.forEach(r => {
         let score = 0;
-        let sources = [];
+        const sources = new Set();
 
         if (emailCols.some(i => keywords.some(k => normalize(r[i]).includes(k)))) {
           score += 2;
-          sources.push("Email");
+          sources.add("Email");
         }
 
         if (companyCols.some(i => keywords.some(k => normalize(r[i]).includes(k)))) {
           score += 2;
-          sources.push("Company");
+          sources.add("Company");
         }
 
         if (nameCols.some(i => keywords.some(k => normalize(r[i]).includes(k)))) {
           score += 1;
-          sources.push("Name");
+          sources.add("Name");
         }
 
         let status = "Other";
@@ -177,7 +207,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const newRow = [
           ...r,
           status,
-          sources.join(" + ") || "None",
+          sources.size ? Array.from(sources).join(" + ") : "None",
           confidence
         ];
 
@@ -212,12 +242,7 @@ document.addEventListener("DOMContentLoaded", () => {
     a.click();
   }
 
-  downloadAgents.onclick = () =>
-    agents.length && downloadCSV("agents_high_confidence.csv", agents);
-
-  downloadPossible.onclick = () =>
-    possible.length && downloadCSV("agents_possible_review.csv", possible);
-
-  downloadOthers.onclick = () =>
-    others.length && downloadCSV("other_contacts.csv", others);
+  downloadAgents.onclick = () => agents.length && downloadCSV("agents_high_confidence.csv", agents);
+  downloadPossible.onclick = () => possible.length && downloadCSV("agents_possible_review.csv", possible);
+  downloadOthers.onclick = () => others.length && downloadCSV("other_contacts.csv", others);
 });
