@@ -3,102 +3,190 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Filter Real Estate Agents | CSV Automation Tools</title>
+  <title>Filter Real Estate Agents | Leadcleer</title>
 
   <link rel="stylesheet" href="../assets/css/main.css" />
 </head>
 
 <body>
 
-<!-- ✅ BACK TO HOME -->
-<a href="../index.html" class="back-home">← Home</a>
+<!-- ================= NAV ================= -->
+<header class="nav">
+  <div class="nav-container">
+    <a href="../index.html" class="logo">Leadcleer</a>
 
-<header class="tool-header">
-  <h1>Filter Real Estate Agents</h1>
-  <p>Upload a CSV and split real estate agents from other contacts</p>
+    <nav class="nav-links">
+      <a href="../index.html">Home</a>
+      <a href="../pages/features.html" class="active">Features</a>
+      <a href="../pages/pricing.html">Pricing</a>
+      <a href="../pages/how-it-works.html">How It Works</a>
+      <a href="../pages/contact.html">Contact</a>
+    </nav>
+  </div>
 </header>
 
-<main class="tool-container">
+<!-- ================= PAGE HERO ================= -->
+<section class="page-hero">
+  <h1>Filter Real Estate Agents</h1>
+  <p>
+    Upload a CSV file and automatically separate real estate agents
+    from other contacts using smart keyword detection.
+  </p>
+</section>
 
-  <!-- Upload -->
-  <div class="card">
-    <div class="upload-box">
+<!-- ================= TOOL CONTAINER ================= -->
+<section style="padding-top:0;">
+  <div class="features-grid-page" style="grid-template-columns: 1fr; max-width: 900px;">
+
+    <!-- ================= UPLOAD ================= -->
+    <div class="feature-card-page">
+      <h2>1. Upload Your CSV</h2>
+      <p class="feature-desc">
+        Select a CSV file from your device. All processing happens locally in your browser.
+      </p>
+
       <input type="file" id="csvFile" accept=".csv" />
-    </div>
-  </div>
 
-  <!-- File Info -->
-  <div class="card">
-    <div class="file-info">
-      <div class="info-item" id="fileName">File name: —</div>
-      <div class="info-item" id="rowCount">Total rows: —</div>
-      <div class="info-item" id="columnCount">Detected columns: —</div>
-    </div>
-  </div>
-
-  <!-- Keyword Editor -->
-  <div class="card">
-    <h2>Detection Keywords</h2>
-    <p>Email-based detection. Edit keywords below.</p>
-
-    <div id="keywordList" class="keyword-list"></div>
-
-    <div class="keyword-add">
-      <input id="newKeyword" placeholder="Add keyword (e.g. realtor)" />
-      <button id="addKeywordBtn">Add</button>
-    </div>
-  </div>
-
-  <!-- Analyze -->
-  <div class="card">
-    <button id="analyzeBtn" class="btn">Analyze CSV</button>
-
-    <!-- Progress -->
-    <div id="progressWrap">
-      <p>Processing: <span id="progressPercent">0%</span></p>
-      <div id="progressBarBg">
-        <div id="progressBar"></div>
+      <div style="margin-top:16px; color:var(--muted); font-size:0.9rem;">
+        Supported format: <strong>.csv</strong>
       </div>
     </div>
 
-    <!-- Results -->
-    <div class="results">
-      <div class="result-box">
-        <strong id="agentCount">—</strong>
-        Real Estate Agents
+    <!-- ================= FILE INFO ================= -->
+    <div class="feature-card-page">
+      <h2>2. File Overview</h2>
+
+      <ul>
+        <li id="fileName">File name: —</li>
+        <li id="rowCount">Total rows: —</li>
+        <li id="columnCount">Detected columns: —</li>
+      </ul>
+    </div>
+
+    <!-- ================= KEYWORDS ================= -->
+    <div class="feature-card-page">
+      <h2>3. Detection Keywords</h2>
+      <p class="feature-desc">
+        Keywords are matched against <strong>email, company, and name fields</strong>.
+        You can add or remove keywords before analyzing.
+      </p>
+
+      <div id="keywordList" class="keyword-list"></div>
+
+      <div style="display:flex; gap:12px; margin-top:16px;">
+        <input
+          id="newKeyword"
+          placeholder="Add keyword (e.g. remax)"
+          style="flex:1;"
+        />
+        <button id="addKeywordBtn" class="btn primary">
+          Add
+        </button>
       </div>
-      <div class="result-box">
-        <strong id="otherCount">—</strong>
-        Other Contacts
+    </div>
+
+    <!-- ================= ANALYZE ================= -->
+    <div class="feature-card-page" style="text-align:center;">
+      <h2>4. Analyze CSV</h2>
+      <p class="feature-desc">
+        Run detection and classify each contact based on confidence.
+      </p>
+
+      <button id="analyzeBtn" class="btn primary" disabled>
+        Analyze CSV
+      </button>
+
+      <!-- ================= RESULTS SUMMARY ================= -->
+      <div class="summary-cards">
+        <div class="summary agent">
+          <strong id="agentCount">—</strong>
+          High Confidence Agents
+        </div>
+
+        <div class="summary possible">
+          <strong id="possibleCount">—</strong>
+          Possible Agents
+        </div>
+
+        <div class="summary other">
+          <strong id="otherCount">—</strong>
+          Other Contacts
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Preview -->
-  <div class="card">
-    <h2>Preview Results</h2>
-    <p>First 10 rows from each group.</p>
+    <!-- ================= PREVIEW ================= -->
+    <div class="feature-card-page">
+      <h2>5. Preview Results</h2>
+      <p class="feature-desc">
+        Showing the first 10 rows from each category.
+      </p>
 
-    <h3>Real Estate Agents</h3>
-    <div class="table-wrap">
-      <table id="agentsPreview"></table>
+      <div class="tabs">
+        <button class="tab active" data-tab="agents">Agents</button>
+        <button class="tab" data-tab="possible">Possible</button>
+        <button class="tab" data-tab="others">Others</button>
+      </div>
+
+      <div id="tab-agents" class="tab-content active">
+        <div class="table-wrap">
+          <table id="agentsPreview"></table>
+        </div>
+      </div>
+
+      <div id="tab-possible" class="tab-content">
+        <div class="table-wrap">
+          <table id="possiblePreview"></table>
+        </div>
+      </div>
+
+      <div id="tab-others" class="tab-content">
+        <div class="table-wrap">
+          <table id="othersPreview"></table>
+        </div>
+      </div>
     </div>
 
-    <h3 style="margin-top:30px;">Other Contacts</h3>
-    <div class="table-wrap">
-      <table id="othersPreview"></table>
+    <!-- ================= DOWNLOADS ================= -->
+    <div class="feature-card-page" style="text-align:center;">
+      <h2>6. Download Results</h2>
+
+      <div style="display:flex; gap:16px; justify-content:center; flex-wrap:wrap;">
+        <button id="downloadAgents" class="btn primary">
+          Download Agents CSV
+        </button>
+
+        <button id="downloadPossible" class="btn">
+          Download Possible Agents CSV
+        </button>
+
+        <button id="downloadOthers" class="btn">
+          Download Other Contacts CSV
+        </button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-brand">
+      <div class="footer-logo">
+        <span class="logo-dot"></span>
+        <span class="logo-text">Leadcleer</span>
+      </div>
+      <p class="footer-tagline">
+        Turn messy CSVs into clean, usable leads — fast.
+      </p>
     </div>
   </div>
 
-  <!-- Downloads -->
-  <div class="card">
-    <div class="downloads">
-      <button id="downloadAgents" class="download-btn">Download Agents CSV</button>
-      <button id="downloadOthers" class="download-btn">Download Other Contacts CSV</button>
-    </div>
+  <div class="footer-bottom">
+    © 2026 Leadcleer. All rights reserved.
   </div>
-
-</main>
+</footer>
 
 <script src="../assets/js/filter-agents.js"></script>
 </body>
