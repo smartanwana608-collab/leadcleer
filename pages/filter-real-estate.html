@@ -29,30 +29,24 @@
 <section class="page-hero">
   <h1>Filter Real Estate Agents</h1>
   <p>
-    Upload a CSV file and automatically separate real estate agents
-    from other contacts using smart keyword detection.
+    Upload a CSV and intelligently separate agents from other contacts
+    using Leadcleer’s confidence-based detection.
   </p>
 </section>
 
-<!-- ================= TOOL CONTAINER ================= -->
 <section style="padding-top:0;">
-  <div class="features-grid-page" style="grid-template-columns: 1fr; max-width: 900px;">
+  <div class="features-grid-page" style="grid-template-columns:1fr; max-width:1000px;">
 
-    <!-- ================= UPLOAD ================= -->
+    <!-- Upload -->
     <div class="feature-card-page">
-      <h2>1. Upload Your CSV</h2>
-      <p class="feature-desc">
-        Select a CSV file from your device. All processing happens locally in your browser.
-      </p>
-
+      <h2>1. Upload CSV</h2>
       <input type="file" id="csvFile" accept=".csv" />
-
-      <div style="margin-top:16px; color:var(--muted); font-size:0.9rem;">
-        Supported format: <strong>.csv</strong>
-      </div>
+      <p style="color:var(--muted); font-size:0.9rem; margin-top:10px;">
+        Processing happens locally in your browser.
+      </p>
     </div>
 
-    <!-- ================= FILE INFO ================= -->
+    <!-- File Info -->
     <div class="feature-card-page">
       <h2>2. File Overview</h2>
       <ul>
@@ -62,51 +56,37 @@
       </ul>
     </div>
 
-    <!-- ================= KEYWORDS ================= -->
+    <!-- Keywords -->
     <div class="feature-card-page">
       <h2>3. Detection Keywords</h2>
       <p class="feature-desc">
-        Keywords are matched against <strong>email, company, and name fields</strong>.
-        You can add or remove keywords before analyzing.
+        Matched against <strong>Email, Company & Name</strong> fields.
       </p>
 
       <div id="keywordList" class="keyword-list"></div>
 
       <div style="display:flex; gap:12px; margin-top:16px;">
-        <input
-          id="newKeyword"
-          placeholder="Add keyword (e.g. remax)"
-          style="flex:1;"
-        />
-        <button id="addKeywordBtn" class="btn primary">
-          Add
-        </button>
+        <input id="newKeyword" placeholder="Add keyword (e.g. remax)" style="flex:1;" />
+        <button id="addKeywordBtn" class="btn primary">Add</button>
       </div>
     </div>
 
-    <!-- ================= ANALYZE ================= -->
+    <!-- Analyze -->
     <div class="feature-card-page" style="text-align:center;">
-      <h2>4. Analyze CSV</h2>
-      <p class="feature-desc">
-        Run detection and classify each contact based on confidence.
-      </p>
-
+      <h2>4. Analyze</h2>
       <button id="analyzeBtn" class="btn primary" disabled>
         Analyze CSV
       </button>
 
-      <!-- ================= RESULTS SUMMARY ================= -->
       <div class="summary-cards">
         <div class="summary agent">
           <strong id="agentCount">—</strong>
-          High Confidence Agents
+          Agents
         </div>
-
         <div class="summary possible">
           <strong id="possibleCount">—</strong>
           Possible Agents
         </div>
-
         <div class="summary other">
           <strong id="otherCount">—</strong>
           Other Contacts
@@ -114,52 +94,42 @@
       </div>
     </div>
 
-    <!-- ================= PREVIEW ================= -->
+    <!-- ================= RESULTS ================= -->
     <div class="feature-card-page">
-      <h2>5. Preview Results</h2>
-      <p class="feature-desc">
-        Showing the first 10 rows from each category.
-      </p>
+      <h2>5. Results Preview</h2>
 
-      <div class="tabs">
-        <button class="tab active" data-tab="agents">Agents</button>
-        <button class="tab" data-tab="possible">Possible</button>
-        <button class="tab" data-tab="others">Others</button>
-      </div>
-
-      <div id="tab-agents" class="tab-content active">
+      <!-- AGENTS -->
+      <div class="feature-card-page" style="margin-bottom:30px;">
+        <h3>Real Estate Agents</h3>
+        <p style="color:var(--muted)">Found: <strong id="agentCount"></strong></p>
         <div class="table-wrap">
           <table id="agentsPreview"></table>
         </div>
+        <button id="downloadAgents" class="btn primary" style="margin-top:16px;">
+          Download Agents CSV
+        </button>
       </div>
 
-      <div id="tab-possible" class="tab-content">
+      <!-- POSSIBLE -->
+      <div class="feature-card-page" style="margin-bottom:30px;">
+        <h3>Possible Agents</h3>
+        <p style="color:var(--muted)">Found: <strong id="possibleCount"></strong></p>
         <div class="table-wrap">
           <table id="possiblePreview"></table>
         </div>
+        <button id="downloadPossible" class="btn" style="margin-top:16px;">
+          Download Possible Agents CSV
+        </button>
       </div>
 
-      <div id="tab-others" class="tab-content">
+      <!-- OTHERS -->
+      <div class="feature-card-page">
+        <h3>Other Contacts</h3>
+        <p style="color:var(--muted)">Found: <strong id="otherCount"></strong></p>
         <div class="table-wrap">
           <table id="othersPreview"></table>
         </div>
-      </div>
-    </div>
-
-    <!-- ================= DOWNLOADS ================= -->
-    <div class="feature-card-page" style="text-align:center;">
-      <h2>6. Download Results</h2>
-
-      <div style="display:flex; gap:16px; justify-content:center; flex-wrap:wrap;">
-        <button id="downloadAgents" class="btn primary">
-          Download Agents CSV
-        </button>
-
-        <button id="downloadPossible" class="btn">
-          Download Possible Agents CSV
-        </button>
-
-        <button id="downloadOthers" class="btn">
+        <button id="downloadOthers" class="btn" style="margin-top:16px;">
           Download Other Contacts CSV
         </button>
       </div>
@@ -173,39 +143,19 @@
   <div class="disclaimer-box">
     <h3>Important Disclaimer</h3>
     <p>
-      Leadcleer processes CSV files locally in your browser.
-      We do <strong>not</strong> upload or store your data.
+      Leadcleer processes files locally. No uploads. No storage.
     </p>
     <p>
-      You are responsible for ensuring you have the legal right
-      to process and classify this data.
+      You are responsible for legal compliance of this data.
     </p>
-
     <div class="disclaimer-actions">
-      <button id="disclaimerCancel" class="btn">
-        Cancel
-      </button>
-      <button id="disclaimerAccept" class="btn primary">
-        Continue
-      </button>
+      <button id="disclaimerCancel" class="btn">Cancel</button>
+      <button id="disclaimerAccept" class="btn primary">Continue</button>
     </div>
   </div>
 </div>
 
-<!-- ================= FOOTER ================= -->
 <footer class="footer">
-  <div class="footer-container">
-    <div class="footer-brand">
-      <div class="footer-logo">
-        <span class="logo-dot"></span>
-        <span class="logo-text">Leadcleer</span>
-      </div>
-      <p class="footer-tagline">
-        Turn messy CSVs into clean, usable leads — fast.
-      </p>
-    </div>
-  </div>
-
   <div class="footer-bottom">
     © 2026 Leadcleer. All rights reserved.
   </div>
