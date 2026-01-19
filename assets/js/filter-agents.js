@@ -1,8 +1,6 @@
 const STORAGE_KEY = "csv_agent_keywords";
 
-/* =====================================================
-SYSTEM KEYWORDS (INVISIBLE TO USER)
-===================================================== */
+/* ================= SYSTEM KEYWORDS (HIDDEN) ================= */
 const SYSTEM_KEYWORDS = [
   "remax","sutton","rlp","c21","century","real","realty",
   "exp","kw","coldwell","broker","brokerage","agent","homes"
@@ -10,14 +8,12 @@ const SYSTEM_KEYWORDS = [
 
 let userKeywords = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
-const saveUserKeywords = () =>
+const saveKeywords = () =>
   localStorage.setItem(STORAGE_KEY, JSON.stringify(userKeywords));
 
 const normalize = v => (v || "").toString().toLowerCase().trim();
 
-/* =====================================================
-CSV PARSER
-===================================================== */
+/* ================= CSV PARSER ================= */
 function parseCSV(text) {
   const rows = [];
   let row = [], val = "", inQuotes = false;
@@ -50,18 +46,19 @@ function parseCSV(text) {
   return rows;
 }
 
-/* =====================================================
-UI HELPERS
-===================================================== */
+/* ================= UI HELPERS ================= */
 function renderUserKeywords(container) {
   container.innerHTML = "";
+
+  if (!userKeywords.length) return;
+
   userKeywords.forEach((k, i) => {
     const chip = document.createElement("span");
     chip.className = "keyword-chip";
-    chip.textContent = k + " ×";
+    chip.innerHTML = `${k} ✕`;
     chip.onclick = () => {
       userKeywords.splice(i, 1);
-      saveUserKeywords();
+      saveKeywords();
       renderUserKeywords(container);
     };
     container.appendChild(chip);
@@ -71,28 +68,24 @@ function renderUserKeywords(container) {
 function renderPreview(table, headers, rows) {
   table.innerHTML = "";
 
-  if (!rows.length) {
-    table.innerHTML = `
-      <tbody>
-        <tr><td>No records to preview</td></tr>
-      </tbody>`;
-    return;
-  }
+  if (!rows.length) return;
 
   table.innerHTML = `
     <thead>
       <tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr>
     </thead>
     <tbody>
-      ${rows.slice(0, 5).map(r =>
+      ${rows.slice(0,5).map(r =>
         `<tr>${r.map(v => `<td>${v || ""}</td>`).join("")}</tr>`
       ).join("")}
     </tbody>
   `;
 }
 
+/* ================= DOWNLOAD ================= */
 function downloadCSV(filename, headers, rows) {
   const escape = v => `"${(v ?? "").toString().replace(/"/g, '""')}"`;
+
   const csv = [
     headers.map(escape).join(","),
     ...rows.map(r => r.map(escape).join(","))
@@ -105,9 +98,7 @@ function downloadCSV(filename, headers, rows) {
   a.click();
 }
 
-/* =====================================================
-MAIN
-===================================================== */
+/* ================= MAIN ================= */
 document.addEventListener("DOMContentLoaded", () => {
   const $ = id => document.getElementById(id);
 
@@ -134,69 +125,45 @@ document.addEventListener("DOMContentLoaded", () => {
   const addKeywordBtn = $("addKeywordBtn");
   const newKeywordInput = $("newKeyword");
 
-  const modal = $("disclaimerModal");
-  const accept = $("disclaimerAccept");
-  const cancel = $("disclaimerCancel");
-
   let headers = [];
   let rows = [];
-  let disclaimerAccepted = false;
 
   analyzeBtn.disabled = true;
   renderUserKeywords(keywordList);
 
-  /* ================= DISCLAIMER ================= */
-  accept.onclick = () => {
-    disclaimerAccepted = true;
-    modal.classList.remove("show");
-  };
-
-  cancel.onclick = () => {
-    modal.classList.remove("show");
-    fileInput.value = "";
-    analyzeBtn.disabled = true;
-  };
-
-  /* ================= FILE UPLOAD ================= */
+  /* ===== FILE UPLOAD ===== */
   fileInput.onchange = () => {
     const file = fileInput.files[0];
     if (!file) return;
 
-    modal.classList.add("show");
-
     const reader = new FileReader();
     reader.onload = e => {
       const parsed = parseCSV(e.target.result);
-      headers = parsed[0] || [];
+      headers = parsed[0];
       rows = parsed.slice(1);
 
-      fileNameEl.textContent = `File: ${file.name}`;
-      rowCountEl.textContent = `Rows: ${rows.length}`;
-      columnCountEl.textContent = `Columns: ${headers.length}`;
+      fileNameEl.textContent = file.name;
+      rowCountEl.textContent = rows.length;
+      columnCountEl.textContent = headers.length;
 
       analyzeBtn.disabled = false;
     };
     reader.readAsText(file);
   };
 
-  /* ================= ADD USER KEYWORD ================= */
+  /* ===== ADD USER KEYWORD ===== */
   addKeywordBtn.onclick = () => {
     const val = normalize(newKeywordInput.value);
     if (val && !userKeywords.includes(val)) {
       userKeywords.push(val);
-      saveUserKeywords();
+      saveKeywords();
       renderUserKeywords(keywordList);
       newKeywordInput.value = "";
     }
   };
 
-  /* ================= ANALYZE ================= */
+  /* ===== ANALYZE CSV ===== */
   analyzeBtn.onclick = () => {
-    if (!disclaimerAccepted) {
-      modal.classList.add("show");
-      return;
-    }
-
     const agents = [];
     const possible = [];
     const others = [];
@@ -207,8 +174,10 @@ document.addEventListener("DOMContentLoaded", () => {
       let score = 0;
 
       r.forEach(cell => {
+        const value = normalize(cell);
+
         allKeywords.forEach(k => {
-          if (normalize(cell).includes(k)) score++;
+          if (value.includes(k)) score++;
         });
       });
 
