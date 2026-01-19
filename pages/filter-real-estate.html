@@ -7,200 +7,173 @@
 
   <!-- Main Styles -->
   <link rel="stylesheet" href="../assets/css/main.css" />
-
-  <!-- PAGE-SAFE FIX (SCOPED ONLY TO THIS PAGE) -->
-  <style>
-    .tool-container {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding-bottom: 120px;
-    }
-
-    .tool-card {
-      max-width: 100%;
-    }
-
-    #resultsPreview {
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-
-    #resultsPreview .results-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 40px;
-      margin-top: 40px;
-    }
-
-    #resultsPreview .preview-table {
-      background: transparent;
-    }
-  </style>
 </head>
 
 <body>
 
 <!-- ===============================
-HEADER / NAV
+APP LAYOUT
 ================================ -->
-<header class="nav">
-  <div class="nav-container">
-    <div class="logo">Leadcleer</div>
-    <nav class="nav-links">
-      <a href="../index.html">Home</a>
-      <a href="../features.html" class="active">Features</a>
-      <a href="../pricing.html">Pricing</a>
-      <a href="../how-it-works.html">How It Works</a>
-      <a href="../contact.html">Contact</a>
+<div class="app-shell">
+
+  <!-- ===============================
+  SIDEBAR
+  ================================ -->
+  <aside class="app-sidebar">
+    <div class="sidebar-brand">Leadcleer</div>
+
+    <nav class="sidebar-nav">
+      <a href="#" class="active">Filter Agents</a>
+      <a href="#">Feature 2 (Coming)</a>
+      <a href="#">Exports</a>
+      <a href="#">Settings</a>
     </nav>
+  </aside>
+
+  <!-- ===============================
+  MAIN APP CONTENT
+  ================================ -->
+  <div class="app-main">
+
+    <!-- Top App Header -->
+    <header class="app-header">
+      <h1>Filter Real Estate Agents</h1>
+      <p>Upload a CSV and intelligently classify contacts</p>
+    </header>
+
+    <main class="tool-container">
+
+      <!-- ===============================
+      1. UPLOAD CSV
+      ================================ -->
+      <section class="tool-card">
+        <h2 class="section-title">1. Upload CSV</h2>
+        <input type="file" id="csvFile" accept=".csv" />
+        <p class="muted">Processing happens locally in your browser.</p>
+      </section>
+
+      <!-- ===============================
+      2. FILE OVERVIEW
+      ================================ -->
+      <section class="tool-card">
+        <h2 class="section-title">2. File Overview</h2>
+        <p id="fileName">File name: —</p>
+        <p id="rowCount">Total rows: —</p>
+        <p id="columnCount">Detected columns: —</p>
+      </section>
+
+      <!-- ===============================
+      3. DETECTION KEYWORDS
+      ================================ -->
+      <section class="tool-card">
+        <h2 class="section-title">3. Detection Keywords</h2>
+        <p class="section-subtitle">
+          Matched against <strong>Email, Company & Name</strong> fields.
+        </p>
+
+        <div id="keywordList" class="keyword-list"></div>
+
+        <div class="keyword-add">
+          <input id="newKeyword" type="text" placeholder="Add keyword (e.g. remax)" />
+          <button id="addKeywordBtn" class="btn secondary">Add</button>
+        </div>
+      </section>
+
+      <!-- ===============================
+      4. ANALYZE
+      ================================ -->
+      <section class="tool-card">
+        <h2 class="section-title">4. Analyze</h2>
+
+        <button id="analyzeBtn" class="btn primary" disabled>
+          Analyze CSV
+        </button>
+
+        <div class="analyze-summary">
+          <p><strong id="agentTotal">0</strong> Agents</p>
+          <p><strong id="possibleTotal">0</strong> Possible Agents</p>
+          <p><strong id="otherTotal">0</strong> Other Contacts</p>
+        </div>
+      </section>
+
+      <!-- ===============================
+      5. RESULTS PREVIEW
+      ================================ -->
+      <section class="tool-card" id="resultsPreview">
+
+        <h2 class="section-title">5. Results Preview</h2>
+        <p class="section-subtitle">
+          Preview of the first 10 records from each category.
+        </p>
+
+        <div class="results-grid">
+
+          <!-- AGENTS -->
+          <div class="result-card">
+            <div class="result-header">
+              <h3>Real Estate Agents</h3>
+              <span class="count-badge agent-badge">
+                <span id="agentCount">0</span> Found
+              </span>
+            </div>
+
+            <div class="table-wrap">
+              <table id="agentsPreviewTable" class="preview-table"></table>
+            </div>
+
+            <div class="result-actions">
+              <button id="downloadAgents" class="btn primary">
+                Download Agents CSV
+              </button>
+            </div>
+          </div>
+
+          <!-- POSSIBLE -->
+          <div class="result-card">
+            <div class="result-header">
+              <h3>Possible Agents</h3>
+              <span class="count-badge possible-badge">
+                <span id="possibleCount">0</span> Found
+              </span>
+            </div>
+
+            <div class="table-wrap">
+              <table id="possiblePreviewTable" class="preview-table"></table>
+            </div>
+
+            <div class="result-actions">
+              <button id="downloadPossible" class="btn secondary">
+                Download Possible CSV
+              </button>
+            </div>
+          </div>
+
+          <!-- OTHERS -->
+          <div class="result-card">
+            <div class="result-header">
+              <h3>Other Contacts</h3>
+              <span class="count-badge other-badge">
+                <span id="otherCount">0</span> Found
+              </span>
+            </div>
+
+            <div class="table-wrap">
+              <table id="othersPreviewTable" class="preview-table"></table>
+            </div>
+
+            <div class="result-actions">
+              <button id="downloadOthers" class="btn secondary">
+                Download Others CSV
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
   </div>
-</header>
-
-<!-- ===============================
-HERO
-================================ -->
-<section class="hero">
-  <div class="hero-content">
-    <h1>Filter <span>Real Estate Agents</span></h1>
-    <p class="hero-subtext">
-      Upload a CSV and intelligently separate agents from other contacts using
-      Leadcleer’s confidence-based detection.
-    </p>
-  </div>
-  <div class="hero-glow"></div>
-</section>
-
-<main class="tool-container">
-
-  <!-- ===============================
-  1. UPLOAD CSV
-  ================================ -->
-  <section class="tool-card">
-    <h2 class="section-title">1. Upload CSV</h2>
-    <input type="file" id="csvFile" accept=".csv" />
-    <p class="muted">Processing happens locally in your browser.</p>
-  </section>
-
-  <!-- ===============================
-  2. FILE OVERVIEW
-  ================================ -->
-  <section class="tool-card">
-    <h2 class="section-title">2. File Overview</h2>
-    <p id="fileName">File name: —</p>
-    <p id="rowCount">Total rows: —</p>
-    <p id="columnCount">Detected columns: —</p>
-  </section>
-
-  <!-- ===============================
-  3. DETECTION KEYWORDS
-  ================================ -->
-  <section class="tool-card">
-    <h2 class="section-title">3. Detection Keywords</h2>
-    <p class="section-subtitle">
-      Matched against <strong>Email, Company & Name</strong> fields.
-    </p>
-
-    <div id="keywordList" class="keyword-list"></div>
-
-    <div class="keyword-add">
-      <input id="newKeyword" type="text" placeholder="Add keyword (e.g. remax)" />
-      <button id="addKeywordBtn" class="btn secondary">Add</button>
-    </div>
-  </section>
-
-  <!-- ===============================
-  4. ANALYZE
-  ================================ -->
-  <section class="tool-card">
-    <h2 class="section-title">4. Analyze</h2>
-
-    <button id="analyzeBtn" class="btn primary" disabled>
-      Analyze CSV
-    </button>
-
-    <div class="analyze-summary">
-      <p><strong id="agentTotal">0</strong> Agents</p>
-      <p><strong id="possibleTotal">0</strong> Possible Agents</p>
-      <p><strong id="otherTotal">0</strong> Other Contacts</p>
-    </div>
-  </section>
-
-  <!-- ===============================
-  5. RESULTS PREVIEW
-  ================================ -->
-  <section class="tool-card" id="resultsPreview">
-
-    <h2 class="section-title">5. Results Preview</h2>
-    <p class="section-subtitle">
-      Preview of the first 10 records from each category. Download full CSVs below.
-    </p>
-
-    <div class="results-grid">
-
-      <!-- AGENTS -->
-      <div class="result-card agents-card">
-        <div class="result-header">
-          <h3>Real Estate Agents</h3>
-          <span class="count-badge agent-badge">
-            <span id="agentCount">0</span> Found
-          </span>
-        </div>
-
-        <div class="table-wrap">
-          <table id="agentsPreviewTable" class="preview-table"></table>
-        </div>
-
-        <div class="result-actions">
-          <button id="downloadAgents" class="btn primary">
-            Download Agents CSV
-          </button>
-        </div>
-      </div>
-
-      <!-- POSSIBLE AGENTS -->
-      <div class="result-card possible-card">
-        <div class="result-header">
-          <h3>Possible Agents</h3>
-          <span class="count-badge possible-badge">
-            <span id="possibleCount">0</span> Found
-          </span>
-        </div>
-
-        <div class="table-wrap">
-          <table id="possiblePreviewTable" class="preview-table"></table>
-        </div>
-
-        <div class="result-actions">
-          <button id="downloadPossible" class="btn secondary">
-            Download Possible Agents CSV
-          </button>
-        </div>
-      </div>
-
-      <!-- OTHER CONTACTS -->
-      <div class="result-card other-card">
-        <div class="result-header">
-          <h3>Other Contacts</h3>
-          <span class="count-badge other-badge">
-            <span id="otherCount">0</span> Found
-          </span>
-        </div>
-
-        <div class="table-wrap">
-          <table id="othersPreviewTable" class="preview-table"></table>
-        </div>
-
-        <div class="result-actions">
-          <button id="downloadOthers" class="btn secondary">
-            Download Other Contacts CSV
-          </button>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-</main>
+</div>
 
 <!-- ===============================
 SCRIPT
