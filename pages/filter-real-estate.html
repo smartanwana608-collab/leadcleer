@@ -1,21 +1,53 @@
-<section class="filter-page">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Filter Real Estate Agents | Leadcleer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Upload -->
-  <div class="filter-section">
+  <!-- GLOBAL CSS -->
+  <link rel="stylesheet" href="../assets/css/main.css" />
+
+  <!-- PAPAPARSE (REQUIRED) -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+</head>
+
+<body>
+
+<!-- GLOBAL NAV (unchanged) -->
+<header class="nav">
+  <div class="nav-container">
+    <div class="logo">Leadcleer</div>
+    <nav class="nav-links">
+      <a href="../index.html">Home</a>
+      <a href="../features.html" class="active">Features</a>
+      <a href="../pricing.html">Pricing</a>
+      <a href="../how-it-works.html">How It Works</a>
+      <a href="../contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main class="filter-page">
+
+  <!-- 1. Upload -->
+  <section class="filter-section">
     <h2>1. Upload CSV</h2>
+
     <div class="upload-box">
       <input type="file" id="csvInput" accept=".csv" />
+      <p>Choose a CSV file from your computer</p>
     </div>
 
     <div class="file-meta">
-      <div class="meta-pill">File: <span id="fileName">—</span></div>
-      <div class="meta-pill">Rows: <span id="rowCount">—</span></div>
-      <div class="meta-pill">Columns: <span id="colCount">—</span></div>
+      <span class="meta-pill">File — <span id="fileName">—</span></span>
+      <span class="meta-pill">Rows — <span id="rowCount">—</span></span>
+      <span class="meta-pill">Columns — <span id="colCount">—</span></span>
     </div>
-  </div>
+  </section>
 
-  <!-- Keywords -->
-  <div class="filter-section">
+  <!-- 2. Keywords -->
+  <section class="filter-section">
     <h2>2. Detection Keywords</h2>
     <p>Matched across name, company, and email</p>
 
@@ -25,22 +57,23 @@
       <input id="newKeyword" placeholder="Add keyword" />
       <button onclick="addKeyword()">Add</button>
     </div>
-  </div>
+  </section>
 
-  <!-- Analyze -->
-  <div class="filter-section">
+  <!-- 3. Analyze -->
+  <section class="filter-section">
     <h2>3. Analyze</h2>
-    <button onclick="analyzeCSV()">Analyze CSV</button>
+
+    <button class="btn primary" onclick="analyzeCSV()">Analyze CSV</button>
 
     <div class="analyze-row">
-      <div class="stat-pill"><span id="agentCount">0</span> Agents</div>
-      <div class="stat-pill"><span id="possibleCount">0</span> Possible</div>
-      <div class="stat-pill"><span id="otherCount">0</span> Others</div>
+      <span class="stat-pill"><span id="agentCount">0</span> Agents</span>
+      <span class="stat-pill"><span id="possibleCount">0</span> Possible</span>
+      <span class="stat-pill"><span id="otherCount">0</span> Others</span>
     </div>
-  </div>
+  </section>
 
-  <!-- Preview -->
-  <div class="filter-section">
+  <!-- 4. Results -->
+  <section class="filter-section">
     <h2>Results Preview</h2>
 
     <div class="preview-grid">
@@ -69,10 +102,19 @@
     </div>
 
     <div class="download-row">
-      <button onclick="download('agents')">Download Agents CSV</button>
-      <button onclick="download('possible')">Download Possible CSV</button>
-      <button onclick="download('others')">Download Others CSV</button>
+      <button onclick="downloadCSV('agents')">Download Agents CSV</button>
+      <button onclick="downloadCSV('possible')">Download Possible CSV</button>
+      <button onclick="downloadCSV('others')">Download Others CSV</button>
     </div>
-  </div>
+  </section>
 
-</section>
+</main>
+
+<!-- GLOBAL FOOTER (unchanged) -->
+<footer class="footer">
+  <div class="footer-bottom">© 2026 Leadcleer</div>
+</footer>
+
+<script src="../assets/js/filter-agents.js"></script>
+</body>
+</html>
