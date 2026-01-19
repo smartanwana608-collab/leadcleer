@@ -1,88 +1,38 @@
-// ===================================
-// REMOVE ROWS MISSING EMAIL (ACTION)
-// File: remove-missing-email.js
-// ===================================
+export function removeMissingEmails({ headers, rows }) {
+  const emailIndex = headers.findIndex(h =>
+    h.toLowerCase().includes("email")
+  );
 
-/**
- * Find all email column indexes
- */
-function findEmailColumns(headers = []) {
-  return headers
-    .map((h, i) => ({ name: h.toLowerCase(), index: i }))
-    .filter(col => col.name.includes("email"))
-    .map(col => col.index);
-}
-
-/**
- * Check if a row has at least one email
- */
-function rowHasEmail(row, emailIndexes) {
-  return emailIndexes.some(index => {
-    const value = row[index];
-    return value && value.toString().trim() !== "";
-  });
-}
-
-/**
- * Remove rows missing email
- *
- * @param {Array} headers
- * @param {Array} rows
- * @returns {Object}
- */
-function removeMissingEmail(headers, rows) {
-  // 🛡️ Defensive defaults
-  if (!Array.isArray(rows)) {
+  if (emailIndex === -1) {
     return {
-      headers: headers || [],
-      rows: [],
-      meta: {
-        kept: 0,
-        removed: 0,
-        emailColumns: 0
-      }
-    };
-  }
-
-  const emailIndexes = findEmailColumns(headers);
-
-  // If no email column → return original rows safely
-  if (!emailIndexes.length) {
-    return {
+      success: false,
+      message: "No email column found in this CSV.",
       headers,
-      rows,
-      meta: {
-        kept: rows.length,
-        removed: 0,
-        emailColumns: 0,
-        warning: "No email column found"
-      }
+      rows
     };
   }
 
-  const kept = [];
-  let removedCount = 0;
+  const cleaned = [];
+  const removed = [];
 
   rows.forEach(row => {
-    if (rowHasEmail(row, emailIndexes)) {
-      kept.push(row);
+    const email = (row[emailIndex] || "").toString().trim();
+
+    if (!email || !email.includes("@")) {
+      removed.push(row);
     } else {
-      removedCount++;
+      cleaned.push(row);
     }
   });
 
   return {
+    success: true,
+    action: "remove-missing-emails",
     headers,
-    rows: kept,
+    rows: cleaned,
     meta: {
-      kept: kept.length,
-      removed: removedCount,
-      emailColumns: emailIndexes.length
+      removedCount: removed.length,
+      remainingCount: cleaned.length
     }
   };
 }
-
-// ===================================
-// EXPORT FOR PROMPT ENGINE
-// ===================================
-window.removeMissingEmail = removeMissingEmail;
