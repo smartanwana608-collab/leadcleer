@@ -67,7 +67,6 @@ function renderUserKeywords(container) {
 
 function renderPreview(table, headers, rows) {
   table.innerHTML = "";
-
   if (!rows.length) return;
 
   table.innerHTML = `
@@ -125,10 +124,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const addKeywordBtn = $("addKeywordBtn");
   const newKeywordInput = $("newKeyword");
 
+  const resultsSection = $("resultsPreview");
+
   let headers = [];
   let rows = [];
 
+  /* Initial state */
   analyzeBtn.disabled = true;
+  resultsSection.style.display = "none";
   renderUserKeywords(keywordList);
 
   /* ===== FILE UPLOAD ===== */
@@ -139,7 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const reader = new FileReader();
     reader.onload = e => {
       const parsed = parseCSV(e.target.result);
-      headers = parsed[0];
+      headers = parsed[0] || [];
       rows = parsed.slice(1);
 
       fileNameEl.textContent = file.name;
@@ -147,6 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
       columnCountEl.textContent = headers.length;
 
       analyzeBtn.disabled = false;
+      resultsSection.style.display = "none";
     };
     reader.readAsText(file);
   };
@@ -164,6 +168,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ===== ANALYZE CSV ===== */
   analyzeBtn.onclick = () => {
+    if (!rows.length || !headers.length) return;
+
     const agents = [];
     const possible = [];
     const others = [];
@@ -175,7 +181,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       r.forEach(cell => {
         const value = normalize(cell);
-
         allKeywords.forEach(k => {
           if (value.includes(k)) score++;
         });
@@ -200,5 +205,9 @@ document.addEventListener("DOMContentLoaded", () => {
       downloadCSV("possible_agents.csv", headers, possible);
     downloadOthers.onclick = () =>
       downloadCSV("other_contacts.csv", headers, others);
+
+    /* Reveal results (UX step completion) */
+    resultsSection.style.display = "block";
+    resultsSection.scrollIntoView({ behavior: "smooth" });
   };
 });
