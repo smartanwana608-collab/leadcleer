@@ -2,8 +2,15 @@ let keywords = [
   "remax","sutton","rlp","c21","century","coldwell","sotheby",
   "exp","kw",
   "real","realty","broker","brokerage",
-  "agent","realtor",
-  "home","homes","estate"
+  "agent","Abingdon Moore Realty", "realtor",
+  "home","homes","estate","Advanced Property Management & Real Estate",
+  "Alexandrite Real Estate Ltd","Ardent Properties Inc","Associa British Columbia Inc",
+  "AY Victoria Realty Ltd","B.C. Farm & Ranch Realty Corp","Bel Air Realty Group","Breakwater Realty Inc",
+  "Burr Properties Ltd","Capital Asset Group","Capital Asset Group","CBRE Limited","Century 21 Harbour Realty Ltd",
+  "Clover Residential Ltd","Coastal Life Realty Ltd","Coldwell Banker Oceanside Real Estate","Coldwell Banker Oceanside Real Estate",
+  "Colliers","Colliers International (Nan)","Couverdon Realty Ltd","Cushman & Wakefield ULC","D.F.H. Real Estate Ltd. (CwnBy)",
+  "Dark Horse Realty","Day Team Realty Ltd","Devon Properties","DFH Real Estate - Sidney","DFH Real Estate - West Shore",
+  "DFH Real Estate Ltd","Dockside Realty Ltd","Easy List Realty",
 ];
 
 let rows = [];
